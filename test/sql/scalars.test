@@ -1,0 +1,88 @@
+# name: test/sql/scalars.test
+# group: [vgi_hl7]
+#
+# Scalars: hl7_get, hl7_message_type, hl7_version, hl7_message_control_id, is_valid_hl7.
+
+require-env VGI_HL7_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION '${VGI_HL7_WORKER}');
+
+# ---- hl7_get over the committed ADT^A01 fixture -----------------------------
+
+# PID-5.1 = patient family name.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')), 'PID-5.1');
+----
+DOE
+
+# PID-5.2 = given name.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')), 'PID-5.2');
+----
+JOHN
+
+# PID-3 whole field -> first repetition raw value.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')), 'PID-3');
+----
+123456^^^MRN
+
+# MSH-9.1 = message code.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')), 'MSH-9.1');
+----
+ADT
+
+# Absent element -> NULL.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')), 'PID-99') IS NULL;
+----
+true
+
+# ---- MSH accessor scalars ---------------------------------------------------
+
+query III
+SELECT
+  hl7.hl7_message_type((SELECT content FROM read_text('test/sql/data/adt_a01.hl7'))),
+  hl7.hl7_version((SELECT content FROM read_text('test/sql/data/adt_a01.hl7'))),
+  hl7.hl7_message_control_id((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')));
+----
+ADT^A01	2.5	MSG00001
+
+# ---- custom encoding chars (non-default MSH-2) ------------------------------
+
+# Field sep '#', component '*': PID-5.1 = SMITH.
+query I
+SELECT hl7.hl7_get((SELECT content FROM read_text('test/sql/data/custom_encoding.hl7')), 'PID-5.1');
+----
+SMITH
+
+# ---- is_valid_hl7 -----------------------------------------------------------
+
+query I
+SELECT hl7.is_valid_hl7((SELECT content FROM read_text('test/sql/data/adt_a01.hl7')));
+----
+true
+
+query I
+SELECT hl7.is_valid_hl7((SELECT content FROM read_text('test/sql/data/custom_encoding.hl7')));
+----
+true
+
+query I
+SELECT hl7.is_valid_hl7('this is not HL7 at all');
+----
+false
+
+# NULL message -> NULL.
+query I
+SELECT hl7.is_valid_hl7(NULL) IS NULL;
+----
+true
+
+statement ok
+DETACH hl7;

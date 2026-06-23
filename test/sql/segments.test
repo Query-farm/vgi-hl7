@@ -1,0 +1,73 @@
+# name: test/sql/segments.test
+# group: [vgi_hl7]
+#
+# hl7_segments / hl7_fields over inline ADT^A01 message literals.
+#
+# Note: VGI table functions cannot take a subquery argument, so the message is
+# supplied as an inline E'...' literal with \r segment separators (the HL7 wire
+# form). The committed test/sql/data/*.hl7 fixtures are exercised by the scalar
+# tests (scalars.test), which accept a read_text() subquery argument.
+
+require-env VGI_HL7_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION '${VGI_HL7_WORKER}');
+
+# ---- hl7_segments: one row per segment, in order ----------------------------
+
+query III
+SELECT seq, segment, field_count
+FROM hl7.hl7_segments(E'MSH|^~\\&|SENDINGAPP|SENDINGFAC|RECEIVINGAPP|RECEIVINGFAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||123456^^^MRN~789012^^^SSN||DOE^JOHN^Q^JR^DR||19700101|M|||123 MAIN ST^^METROPOLIS^NY^10001\rPV1|1|I|WEST^101^1^GENHOSP||||1234^SMITH^WILLIAM^A^^DR|||SUR')
+ORDER BY seq;
+----
+1	MSH	12
+2	EVN	2
+3	PID	11
+4	PV1	10
+
+# ---- hl7_fields: PID-3 expands into two repetition rows ---------------------
+
+query III
+SELECT field, repetition, value
+FROM hl7.hl7_fields(E'MSH|^~\\&|A|B|C|D|20240101||ADT^A01|X1|P|2.5\rPID|1||123456^^^MRN~789012^^^SSN||DOE^JOHN^Q^JR^DR')
+WHERE segment = 'PID' AND field = 3
+ORDER BY repetition;
+----
+3	0	123456^^^MRN
+3	1	789012^^^SSN
+
+# PID-5 keeps its component structure as the raw value.
+query I
+SELECT value
+FROM hl7.hl7_fields(E'MSH|^~\\&|A|B|C|D|20240101||ADT^A01|X1|P|2.5\rPID|1||123456^^^MRN~789012^^^SSN||DOE^JOHN^Q^JR^DR')
+WHERE segment = 'PID' AND field = 5 AND repetition = 0;
+----
+DOE^JOHN^Q^JR^DR
+
+# MSH-2 (encoding chars) survives verbatim, not split on '~'.
+query I
+SELECT value
+FROM hl7.hl7_fields(E'MSH|^~\\&|A|B|C|D|20240101||ADT^A01|X1|P|2.5\rPID|1||7^^^MRN')
+WHERE segment = 'MSH' AND field = 2;
+----
+^~\&
+
+# ---- malformed input: no MSH -> no rows -------------------------------------
+
+query I
+SELECT count(*) FROM hl7.hl7_segments('this is not HL7 at all');
+----
+0
+
+# ---- NULL input -> no rows --------------------------------------------------
+
+query I
+SELECT count(*) FROM hl7.hl7_segments(NULL);
+----
+0
+
+statement ok
+DETACH hl7;
