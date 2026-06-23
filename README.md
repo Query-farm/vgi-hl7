@@ -4,7 +4,9 @@
 
 <p align="center"><em>A <a href="https://query.farm">Query.Farm</a> VGI worker for DuckDB.</em></p>
 
-# vgi-hl7
+# Parse HL7 v2 Clinical Messages in DuckDB
+
+> **vgi-hl7** · a [Query.Farm](https://query.farm) VGI worker
 
 A [VGI](https://query.farm) worker that parses **HL7 v2.x** clinical messages —
 the pipe-delimited format used across healthcare for ADT, ORU, ORM, and other
