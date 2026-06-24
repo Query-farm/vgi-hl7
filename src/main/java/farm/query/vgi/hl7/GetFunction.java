@@ -37,6 +37,31 @@ public final class GetFunction extends ScalarFn {
         String getMsh = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'MSH-9');";
         return FunctionMetadata.describe(description())
                 .withCategories("hl7", "healthcare", "extraction")
+                .withTags(Meta.objectTags(
+                        "Extract HL7 Value By Location",
+                        "Extracts a single value from an HL7 v2.x message addressed by an HL7 "
+                                + "location string. Supports `'PID-5'` (a whole field), `'PID-5.1'` "
+                                + "(component 1 of field 5), `'MSH-9.1.2'` (component.subcomponent), "
+                                + "and a segment repetition such as `'DG1[2]-3'` or `'DG1(2)-3'`. "
+                                + "Field, component, and subcomponent indices are 1-based per HL7 "
+                                + "convention; the first repetition of a repeating field is "
+                                + "addressed.\n\n"
+                                + "Use it to pull individual data points (patient name, message "
+                                + "type, ordering provider, etc.) out of a feed without exploding "
+                                + "the whole message. Returns NULL when the message is malformed, "
+                                + "the location syntax is invalid, or the addressed element is "
+                                + "absent; a NULL message yields NULL. The `message` argument is a "
+                                + "VARCHAR text or a BLOB of bytes.",
+                        "## hl7_get\n\n"
+                                + "Reads one value from an HL7 v2.x message by location — e.g. "
+                                + "`hl7_get(msg, 'PID-5.1')` for a patient's family name.\n\n"
+                                + "Location grammar: `SEG-field[.component[.subcomponent]]` with an "
+                                + "optional segment repetition `SEG[n]-field`. Indices are 1-based. "
+                                + "Missing/invalid locations return NULL rather than erroring, so "
+                                + "it is safe to run across dirty data.",
+                        "hl7 get, extract, location, PID-5, MSH-9, component, subcomponent, "
+                                + "accessor, field path, pluck value, parse hl7, hl7 v2",
+                        "GetFunction.java"))
                 .withExamples(java.util.List.of(
                         new FunctionExample(getPid,
                                 "Extract the patient's family name (component 1 of PID-5).", "Doe"),

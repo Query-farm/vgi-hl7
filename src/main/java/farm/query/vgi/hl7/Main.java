@@ -32,8 +32,13 @@ public final class Main {
      */
     private static Map<String, String> catalogTags() {
         Map<String, String> tags = new LinkedHashMap<>();
+        tags.put("vgi.title", "HL7 v2.x Clinical Message Parser");
         tags.put(
-                "vgi.description_llm",
+                "vgi.keywords",
+                "hl7, hl7 v2, hl7v2, healthcare, clinical, interoperability, ADT, ORU, ORM, MSH, "
+                        + "PID, segment, field, pipe-delimited, parse, message, EHR, EMR, HL7 location");
+        tags.put(
+                "vgi.doc_llm",
                 "Parse and query HL7 v2.x pipe-delimited clinical messages (ADT, ORU, ORM, "
                         + "etc.) in SQL. Split a message into its segments, explode it into long "
                         + "format (one row per field value with repetitions expanded), extract a "
@@ -42,7 +47,7 @@ public final class Main {
                         + "HL7 v2 message. Use to ingest, validate, and pull fields out of HL7 v2 "
                         + "feeds without a heavyweight HL7 library.");
         tags.put(
-                "vgi.description_md",
+                "vgi.doc_md",
                 "# hl7\n\nParse HL7 v2.x pipe-delimited clinical messages into DuckDB rows over "
                         + "Apache Arrow (pure-Java parser, no HAPI dependency).\n\n"
                         + "**Table functions:** `hl7_segments` (one row per segment), "
@@ -62,15 +67,34 @@ public final class Main {
 
     private static Map<String, String> schemaTags() {
         Map<String, String> tags = new LinkedHashMap<>();
+        tags.put("vgi.title", "HL7 v2.x Parsing — main");
         tags.put(
-                "vgi.description_llm",
+                "vgi.keywords",
+                "hl7, hl7 v2, healthcare, clinical, segments, fields, hl7_get, hl7_segments, "
+                        + "hl7_fields, hl7_message_type, hl7_version, is_valid_hl7, MSH, PID, location");
+        // VGI123 classifying tags — BARE keys (not vgi.-namespaced).
+        tags.put("domain", "healthcare");
+        tags.put("category", "parsing");
+        tags.put("topic", "hl7-v2-clinical-messaging");
+        tags.put(
+                "vgi.source_url",
+                "https://github.com/Query-farm/vgi-hl7/blob/main/src/main/java/farm/query/vgi/hl7/Main.java");
+        tags.put(
+                "vgi.doc_llm",
                 "HL7 v2.x message-parsing functions: split a message into segments, explode it "
                         + "into long-format field rows, extract a value by location (e.g. 'PID-5.1'), "
-                        + "read MSH message type/version/control-id, and validate HL7 v2 text.");
+                        + "read MSH message type/version/control-id, and validate HL7 v2 text. Use "
+                        + "these to ingest and query pipe-delimited clinical feeds directly in SQL.");
         tags.put(
-                "vgi.description_md",
-                "HL7 v2.x clinical-message parsing functions (segments, fields, location "
-                        + "extraction, MSH accessors, validation) over Apache Arrow.");
+                "vgi.doc_md",
+                "## HL7 v2.x parsing functions\n\n"
+                        + "Clinical-message parsing over Apache Arrow: segment splitting "
+                        + "(`hl7_segments`), long-format field explosion (`hl7_fields`), "
+                        + "location extraction (`hl7_get`), MSH accessors "
+                        + "(`hl7_message_type`/`hl7_version`/`hl7_message_control_id`), and "
+                        + "validation (`is_valid_hl7`). The parser is pure-JDK and MSH-driven "
+                        + "(separators are read from the message, not assumed).");
+        tags.put("vgi.example_queries", Examples.SCHEMA_EXAMPLE_QUERIES);
         return tags;
     }
 

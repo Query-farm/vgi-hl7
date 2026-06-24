@@ -31,6 +31,26 @@ public final class IsValidFunction extends ScalarFn {
         String badQuery = "SELECT hl7.main.is_valid_hl7('not an hl7 message');";
         return FunctionMetadata.describe(description())
                 .withCategories("hl7", "healthcare", "validation")
+                .withTags(Meta.objectTags(
+                        "Validate HL7 v2 Message",
+                        "Tests whether text parses as a well-formed HL7 v2.x message: it must begin "
+                                + "with an `MSH` segment that defines the field separator (MSH-1) and "
+                                + "the encoding characters (MSH-2). Returns true for a valid message, "
+                                + "false for malformed text (never an error), and NULL for a NULL "
+                                + "input.\n\n"
+                                + "Use it as a cheap gate before parsing — e.g. filter a staging "
+                                + "table to rows that are actually HL7 v2 before calling "
+                                + "`hl7_segments`, `hl7_fields`, or `hl7_get`. The `message` "
+                                + "argument is a VARCHAR text or a BLOB of bytes.",
+                        "## is_valid_hl7\n\n"
+                                + "Boolean predicate: does this text look like an HL7 v2.x message "
+                                + "(leading MSH with separators and encoding chars)?\n\n"
+                                + "Designed to be safe on dirty input — malformed text returns "
+                                + "`false` rather than raising, and NULL maps to NULL. Pair it with "
+                                + "a `WHERE` clause to skip non-HL7 rows before parsing.",
+                        "is valid hl7, validate, well-formed, MSH, sniff, gate, predicate, "
+                                + "verify message, parse hl7, hl7 v2",
+                        "IsValidFunction.java"))
                 .withExamples(java.util.List.of(
                         new FunctionExample(okQuery,
                                 "Check that a well-formed ADT^A01 message validates.", "true"),

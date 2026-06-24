@@ -44,7 +44,36 @@ public final class FieldsFunction implements TableFunction {
                                 + "(repetitions expanded), keyed by segment, segment occurrence, field, and "
                                 + "repetition. Component structure is preserved in the raw value text.")
                 .withCategories("hl7", "healthcare", "parsing")
-                .withTag("vgi.columns_md", COLUMNS_MD)
+                .withTags(Meta.objectTags(
+                        "Explode HL7 Message Into Field Rows",
+                        "Explodes an HL7 v2.x message into long (tidy) format: one row per field "
+                                + "value, with repeating fields expanded into separate rows. Each "
+                                + "row is keyed by `segment` (3-letter id), `segment_rep` (0-based "
+                                + "occurrence of that segment within the message, to disambiguate "
+                                + "repeated OBX/DG1/etc.), `field` (1-based HL7 field number), and "
+                                + "`repetition` (0-based index of the repeated value); `value` holds "
+                                + "the raw field text with its component/subcomponent structure "
+                                + "preserved.\n\n"
+                                + "Use it to unpivot an entire message for set-based SQL "
+                                + "(filtering, grouping, joining) instead of addressing one location "
+                                + "at a time with `hl7_get`. Note the MSH quirk: MSH-1 (the field "
+                                + "separator) and MSH-2 (the encoding characters, which literally "
+                                + "contain `~`) are emitted as single verbatim values and are not "
+                                + "re-split on the repetition separator. The `message` argument is a "
+                                + "VARCHAR text or BLOB bytes; NULL or malformed input yields no "
+                                + "rows.",
+                        "## hl7_fields\n\n"
+                                + "Unpivots a whole HL7 v2.x message into long format — one row per "
+                                + "field value with repetitions expanded — so you can query it with "
+                                + "ordinary SQL.\n\n"
+                                + "Component/subcomponent structure stays intact in `value`; "
+                                + "decompose it further with `hl7_get` or by splitting on the "
+                                + "encoding characters. MSH-1/MSH-2 are kept verbatim. See "
+                                + "`vgi.result_columns_md` for the returned columns.",
+                        "hl7 fields, long format, tidy, unpivot, explode, repetitions, field value, "
+                                + "segment_rep, component, subcomponent, parse hl7, hl7 v2",
+                        "FieldsFunction.java"))
+                .withTag("vgi.result_columns_md", COLUMNS_MD)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }

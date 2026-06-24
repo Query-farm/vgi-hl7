@@ -39,7 +39,32 @@ public final class SegmentsFunction implements TableFunction {
                         "Split an HL7 v2.x message into its segments: one row per segment with its "
                                 + "3-letter id, field count, and raw text.")
                 .withCategories("hl7", "healthcare", "parsing")
-                .withTag("vgi.columns_md", COLUMNS_MD)
+                .withTags(Meta.objectTags(
+                        "Split HL7 Message Into Segments",
+                        "Splits an HL7 v2.x message into its constituent segments, returning one "
+                                + "row per segment in message order. Each row carries the 1-based "
+                                + "ordinal (`seq`), the 3-letter segment id (`segment`, e.g. `MSH`, "
+                                + "`PID`, `PV1`), the number of fields in the segment (`field_count`, "
+                                + "using HL7 numbering so `MSH-1` counts), and the raw segment text "
+                                + "(`raw`).\n\n"
+                                + "Use it as the first step when ingesting a feed: enumerate what "
+                                + "segments a message contains before drilling into fields with "
+                                + "`hl7_fields` or `hl7_get`. The `message` argument is polymorphic — "
+                                + "a VARCHAR carrying the message text or a BLOB carrying its bytes. "
+                                + "NULL or malformed input (no leading MSH) yields no rows; the "
+                                + "worker never throws.",
+                        "## hl7_segments\n\n"
+                                + "Returns one row per segment of an HL7 v2.x message, in order. "
+                                + "Handy for discovering a message's structure before extracting "
+                                + "fields.\n\n"
+                                + "Pass the message inline as a VARCHAR/BLOB. Malformed or NULL "
+                                + "input simply produces no rows. See `vgi.result_columns_md` for "
+                                + "the returned columns.",
+                        "hl7 segments, split message, segment list, MSH, PID, PV1, parse hl7, "
+                                + "segment id, message structure, hl7 v2",
+                        "SegmentsFunction.java"))
+                .withTag("vgi.result_columns_md", COLUMNS_MD)
+                .withTag("vgi.executable_examples", Examples.EXECUTABLE_EXAMPLES)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }

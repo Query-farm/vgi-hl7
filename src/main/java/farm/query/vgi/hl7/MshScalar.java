@@ -24,12 +24,21 @@ abstract class MshScalar extends ScalarFn {
     private final int mshField;
     private final String description;
     private final FunctionExample example;
+    private final String title;
+    private final String docLlm;
+    private final String docMd;
+    private final String keywords;
 
-    MshScalar(String sqlName, int mshField, String description, FunctionExample example) {
+    MshScalar(String sqlName, int mshField, String description, FunctionExample example,
+              String title, String docLlm, String docMd, String keywords) {
         this.sqlName = sqlName;
         this.mshField = mshField;
         this.description = description;
         this.example = example;
+        this.title = title;
+        this.docLlm = docLlm;
+        this.docMd = docMd;
+        this.keywords = keywords;
     }
 
     @Override public final String name() { return sqlName; }
@@ -39,6 +48,7 @@ abstract class MshScalar extends ScalarFn {
     @Override public final FunctionMetadata metadata() {
         return FunctionMetadata.describe(description)
                 .withCategories("hl7", "healthcare")
+                .withTags(Meta.objectTags(title, docLlm, docMd, keywords, "MshScalar.java"))
                 .withExamples(java.util.List.of(example))
                 .withTag("vgi.example_queries",
                         Examples.exampleQueriesTag(example.sql(), example.description()));
@@ -75,7 +85,23 @@ abstract class MshScalar extends ScalarFn {
                     new FunctionExample(
                             "SELECT hl7.main.hl7_message_type(" + Examples.SAMPLE_MSG_SQL + ");",
                             "Read the message type (MSH-9) from an admit message.",
-                            "ADT^A01"));
+                            "ADT^A01"),
+                    "Read HL7 Message Type",
+                    "Reads the HL7 message type from field MSH-9, e.g. `ADT^A01` (event) or "
+                            + "`ADT^A01^ADT_A01` (with the message structure). This identifies what "
+                            + "kind of message it is — an admit (ADT), observation result (ORU), "
+                            + "order (ORM), etc.\n\n"
+                            + "Use it to route or filter a mixed feed by message type. Returns the "
+                            + "raw MSH-9 text, or NULL when the message is malformed or the field is "
+                            + "absent; NULL input yields NULL. The `message` argument is a VARCHAR "
+                            + "text or BLOB bytes.",
+                    "## hl7_message_type\n\n"
+                            + "Returns MSH-9, the HL7 message type/trigger event (e.g. `ADT^A01`).\n\n"
+                            + "The most common dispatch key in an HL7 v2 feed — use it to split or "
+                            + "route messages by type. Malformed/absent input maps to NULL rather "
+                            + "than erroring.",
+                    "hl7 message type, MSH-9, trigger event, ADT, ORU, ORM, message kind, "
+                            + "routing, dispatch, parse hl7, hl7 v2");
         }
         public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
             run(in, out);
@@ -89,7 +115,21 @@ abstract class MshScalar extends ScalarFn {
                     new FunctionExample(
                             "SELECT hl7.main.hl7_version(" + Examples.SAMPLE_MSG_SQL + ");",
                             "Read the HL7 version (MSH-12) from a message.",
-                            "2.5"));
+                            "2.5"),
+                    "Read HL7 Version Id",
+                    "Reads the HL7 version ID from field MSH-12, e.g. `2.3`, `2.5`, or `2.7`. This "
+                            + "tells you which release of the HL7 v2.x standard the message claims "
+                            + "to conform to, which affects field semantics across versions.\n\n"
+                            + "Use it to branch parsing logic or to audit which versions a feed is "
+                            + "sending. Returns the raw MSH-12 text, or NULL when the message is "
+                            + "malformed or the field is absent; NULL input yields NULL. The "
+                            + "`message` argument is a VARCHAR text or BLOB bytes.",
+                    "## hl7_version\n\n"
+                            + "Returns MSH-12, the HL7 v2.x version id (e.g. `2.5`).\n\n"
+                            + "Useful for version-aware handling and feed audits. Malformed or "
+                            + "absent input maps to NULL rather than erroring.",
+                    "hl7 version, MSH-12, version id, 2.3, 2.5, 2.7, standard release, "
+                            + "conformance, parse hl7, hl7 v2");
         }
         public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
             run(in, out);
@@ -103,7 +143,22 @@ abstract class MshScalar extends ScalarFn {
                     new FunctionExample(
                             "SELECT hl7.main.hl7_message_control_id(" + Examples.SAMPLE_MSG_SQL + ");",
                             "Read the message control ID (MSH-10) used for acknowledgements.",
-                            "MSG00001"));
+                            "MSG00001"),
+                    "Read HL7 Message Control Id",
+                    "Reads the message control ID from field MSH-10, the sender-assigned unique "
+                            + "identifier for this message. It is echoed back in the acknowledgement "
+                            + "(ACK MSA-2) and is the key for de-duplication and message tracking.\n\n"
+                            + "Use it to correlate a message with its ACK, to dedupe a feed, or to "
+                            + "trace a single message end to end. Returns the raw MSH-10 text, or "
+                            + "NULL when the message is malformed or the field is absent; NULL input "
+                            + "yields NULL. The `message` argument is a VARCHAR text or BLOB bytes.",
+                    "## hl7_message_control_id\n\n"
+                            + "Returns MSH-10, the message control id — the sender's unique id for "
+                            + "the message, echoed in the ACK (MSA-2).\n\n"
+                            + "Use it for de-duplication, ACK correlation, and message tracing. "
+                            + "Malformed or absent input maps to NULL rather than erroring.",
+                    "hl7 control id, MSH-10, message control id, ACK, MSA-2, dedupe, "
+                            + "deduplication, tracking, correlation, parse hl7, hl7 v2");
         }
         public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
             run(in, out);

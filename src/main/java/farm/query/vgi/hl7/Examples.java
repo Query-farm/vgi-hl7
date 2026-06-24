@@ -21,6 +21,51 @@ final class Examples {
                     + "PID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I'";
 
     /**
+     * Guaranteed-runnable, catalog-qualified examples (VGI509) attached to one
+     * object. Each {@code sql} is self-contained and re-runnable against an
+     * attached {@code hl7} worker; {@code expected_result} is omitted on purpose
+     * (the linter only needs each query to execute cleanly).
+     */
+    static final String EXECUTABLE_EXAMPLES =
+            "[\n"
+                    + "  {\n"
+                    + "    \"description\": \"Split an admit message into its segments in order.\",\n"
+                    + "    \"sql\": \"SELECT seq, segment, field_count FROM hl7.main.hl7_segments("
+                    + SAMPLE_MSG_SQL + ") ORDER BY seq\"\n"
+                    + "  },\n"
+                    + "  {\n"
+                    + "    \"description\": \"Explode the PID segment into long-format field rows.\",\n"
+                    + "    \"sql\": \"SELECT field, repetition, value FROM hl7.main.hl7_fields("
+                    + SAMPLE_MSG_SQL + ") WHERE segment = 'PID' ORDER BY field\"\n"
+                    + "  },\n"
+                    + "  {\n"
+                    + "    \"description\": \"Extract the patient family name (component 1 of PID-5).\",\n"
+                    + "    \"sql\": \"SELECT hl7.main.hl7_get(" + SAMPLE_MSG_SQL + ", 'PID-5.1') AS family_name\"\n"
+                    + "  },\n"
+                    + "  {\n"
+                    + "    \"description\": \"Read the message type, version, and control id from MSH.\",\n"
+                    + "    \"sql\": \"SELECT hl7.main.hl7_message_type(" + SAMPLE_MSG_SQL + ") AS type, "
+                    + "hl7.main.hl7_version(" + SAMPLE_MSG_SQL + ") AS version, "
+                    + "hl7.main.hl7_message_control_id(" + SAMPLE_MSG_SQL + ") AS control_id\"\n"
+                    + "  },\n"
+                    + "  {\n"
+                    + "    \"description\": \"Validate that a well-formed message parses.\",\n"
+                    + "    \"sql\": \"SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ") AS ok\"\n"
+                    + "  }\n"
+                    + "]";
+
+    /** Representative catalog-qualified example queries for the schema (VGI506), a plain string. */
+    static final String SCHEMA_EXAMPLE_QUERIES =
+            "SELECT * FROM hl7.main.hl7_segments(" + SAMPLE_MSG_SQL + ");\n"
+                    + "SELECT segment, field, repetition, value FROM hl7.main.hl7_fields("
+                    + SAMPLE_MSG_SQL + ") WHERE segment = 'PID';\n"
+                    + "SELECT hl7.main.hl7_get(" + SAMPLE_MSG_SQL + ", 'PID-5.1');\n"
+                    + "SELECT hl7.main.hl7_message_type(" + SAMPLE_MSG_SQL + ");\n"
+                    + "SELECT hl7.main.hl7_version(" + SAMPLE_MSG_SQL + ");\n"
+                    + "SELECT hl7.main.hl7_message_control_id(" + SAMPLE_MSG_SQL + ");\n"
+                    + "SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ");";
+
+    /**
      * Build the value for a {@code vgi.example_queries} tag: a JSON array of
      * {@code {"sql", "description"}} objects. The {@code pairs} are flat
      * {@code sql, description, sql, description, …}. The linter (vgi-lint)
