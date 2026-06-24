@@ -90,12 +90,13 @@ Makefile                     build / fixtures / test-unit / test-sql / test / cl
 
 ## SDK dependency & CI (self-contained via Maven Central)
 
-Depends on `farm.query:vgi:0.4.0` (pulls in `farm.query:vgirpc:0.10.2`
+Depends on `farm.query:vgi:0.5.0` (pulls in `farm.query:vgirpc:0.10.2`
 transitively; declared explicitly since the code imports `farm.query.vgirpc.*`).
 **On Maven Central**, so the build is fully self-contained — no sibling checkout,
-no `mavenLocal`, no composite build. `.github/workflows/test.yml` is a single
-`build-and-test` job that resolves from Central and runs JUnit + shadowJar + an
-HTTP boot smoke test + `make test-sql`.
+no `mavenLocal`, no composite build. `.github/workflows/test.yml` runs a
+`build-and-test` job (JUnit + shadowJar + HTTP boot smoke test), a 3-transport
+SQL E2E `integration` matrix, and a `metadata-quality` job that runs `vgi-lint`
+(`Query-farm/vgi-lint-check@v1`, `fail-on: info`) against the built fat JAR.
 
 - The in-process test driver `TestSupport` constructs `TableInitParams` directly,
   so an SDK bump can require appending trailing `null`s (vgi 0.4.0 added

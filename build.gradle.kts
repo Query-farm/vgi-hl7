@@ -41,7 +41,7 @@ dependencies {
     // parser dependency: the parser is pure JDK (see Hl7Message). In particular
     // we deliberately do NOT depend on the HAPI HL7v2 library, whose licensing is
     // murky for commercial use. This keeps vgi-hl7 MIT and dependency-light.
-    implementation("farm.query:vgi:0.4.0")
+    implementation("farm.query:vgi:0.5.0")
     implementation("farm.query:vgirpc:0.10.2")
 
     // slf4j-simple sends ALL log output to System.err. The stdio Arrow-IPC

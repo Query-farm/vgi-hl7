@@ -3,6 +3,7 @@ package farm.query.vgi.hl7;
 import farm.query.vgi.function.ArgSpec;
 import farm.query.vgi.function.Arguments;
 import farm.query.vgi.function.FunctionMetadata;
+import farm.query.vgi.protocol.FunctionExample;
 import farm.query.vgi.internal.SchemaUtil;
 import farm.query.vgi.protocol.BindResponse;
 import farm.query.vgi.table.TableBindParams;
@@ -30,11 +31,28 @@ public final class SegmentsFunction implements TableFunction {
     @Override public String name() { return "hl7_segments"; }
 
     @Override public FunctionMetadata metadata() {
+        String q = "SELECT seq, segment, field_count FROM hl7.main.hl7_segments("
+                + Examples.SAMPLE_MSG_SQL + ");";
+        String desc = "List every segment of an admit message in order (MSH, EVN, PID, PV1) "
+                + "with its field count.";
         return FunctionMetadata.describe(
                         "Split an HL7 v2.x message into its segments: one row per segment with its "
                                 + "3-letter id, field count, and raw text.")
-                .withCategories("hl7", "healthcare", "parsing");
+                .withCategories("hl7", "healthcare", "parsing")
+                .withTag("vgi.columns_md", COLUMNS_MD)
+                .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
+                .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }
+
+    /** Markdown table of the returned columns (static schema, same for every call). */
+    private static final String COLUMNS_MD =
+            "| column | type | description |\n"
+                    + "| --- | --- | --- |\n"
+                    + "| `seq` | INTEGER | 1-based ordinal of the segment within the message. |\n"
+                    + "| `segment` | VARCHAR | 3-letter segment identifier (e.g. MSH, PID, PV1). |\n"
+                    + "| `field_count` | INTEGER | Number of fields in the segment (HL7 numbering; "
+                    + "MSH-1 counts). |\n"
+                    + "| `raw` | VARCHAR | Raw text of the entire segment. |";
 
     @Override public List<ArgSpec> argumentSpecs() {
         // Polymorphic message arg: an any-typed positional so DuckDB binds both a

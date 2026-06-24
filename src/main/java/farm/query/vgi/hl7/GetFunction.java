@@ -2,6 +2,7 @@ package farm.query.vgi.hl7;
 
 import farm.query.vgi.function.Arguments;
 import farm.query.vgi.function.FunctionMetadata;
+import farm.query.vgi.protocol.FunctionExample;
 import farm.query.vgi.scalar.Const;
 import farm.query.vgi.scalar.ScalarFn;
 import farm.query.vgi.scalar.Vector;
@@ -32,7 +33,18 @@ public final class GetFunction extends ScalarFn {
     }
 
     @Override public FunctionMetadata metadata() {
-        return FunctionMetadata.describe(description()).withCategories("hl7", "healthcare", "extraction");
+        String getPid = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'PID-5.1');";
+        String getMsh = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'MSH-9');";
+        return FunctionMetadata.describe(description())
+                .withCategories("hl7", "healthcare", "extraction")
+                .withExamples(java.util.List.of(
+                        new FunctionExample(getPid,
+                                "Extract the patient's family name (component 1 of PID-5).", "Doe"),
+                        new FunctionExample(getMsh,
+                                "Extract the message type field (MSH-9) by location.", "ADT^A01")))
+                .withTag("vgi.example_queries", Examples.exampleQueriesTag(
+                        getPid, "Extract the patient's family name (component 1 of PID-5).",
+                        getMsh, "Extract the message type field (MSH-9) by location."));
     }
 
     @Override protected ArrowType outputType(Schema inputSchema, Arguments args) {

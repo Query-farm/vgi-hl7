@@ -128,3 +128,35 @@ jobs:
         run: ci/run-integration.sh
         env:
           TRANSPORT: ${{ matrix.transport }}
+
+  # Metadata-quality gate: build the worker fat JAR, then run vgi-lint against it
+  # (the action force-installs the signed vgi community extension itself) and fail
+  # on any finding at or above `info`. Kept a separate job so it's visible.
+  metadata-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Build worker fat JAR
+        run: ./gradlew --no-daemon shadowJar
+
+      - name: Resolve worker JAR path
+        run: |
+          # Absolute path: vgi-lint spawns the worker LOCATION as a subprocess.
+          # The fat JAR manifest sets Add-Opens, so a bare `java -jar` works.
+          JAR="$PWD/$(ls build/libs/vgi-hl7-*-all.jar | head -1)"
+          echo "Worker JAR: $JAR"
+          echo "VGI_HL7_WORKER_JAR=$JAR" >> "$GITHUB_ENV"
+
+      - name: vgi-lint
+        uses: Query-farm/vgi-lint-check@v1
+        with:
+          location: "java -jar ${{ env.VGI_HL7_WORKER_JAR }}"
+          fail-on: info

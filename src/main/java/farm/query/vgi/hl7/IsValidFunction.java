@@ -2,6 +2,7 @@ package farm.query.vgi.hl7;
 
 import farm.query.vgi.function.Arguments;
 import farm.query.vgi.function.FunctionMetadata;
+import farm.query.vgi.protocol.FunctionExample;
 import farm.query.vgi.scalar.ScalarFn;
 import farm.query.vgi.scalar.Vector;
 import farm.query.vgi.types.Schemas;
@@ -26,7 +27,18 @@ public final class IsValidFunction extends ScalarFn {
     }
 
     @Override public FunctionMetadata metadata() {
-        return FunctionMetadata.describe(description()).withCategories("hl7", "healthcare", "validation");
+        String okQuery = "SELECT hl7.main.is_valid_hl7(" + Examples.SAMPLE_MSG_SQL + ");";
+        String badQuery = "SELECT hl7.main.is_valid_hl7('not an hl7 message');";
+        return FunctionMetadata.describe(description())
+                .withCategories("hl7", "healthcare", "validation")
+                .withExamples(java.util.List.of(
+                        new FunctionExample(okQuery,
+                                "Check that a well-formed ADT^A01 message validates.", "true"),
+                        new FunctionExample(badQuery,
+                                "Malformed text validates as false (never errors).", "false")))
+                .withTag("vgi.example_queries", Examples.exampleQueriesTag(
+                        okQuery, "Check that a well-formed ADT^A01 message validates.",
+                        badQuery, "Malformed text validates as false (never errors)."));
     }
 
     @Override protected ArrowType outputType(Schema inputSchema, Arguments args) {

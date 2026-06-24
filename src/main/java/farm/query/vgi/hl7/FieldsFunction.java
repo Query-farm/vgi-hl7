@@ -3,6 +3,7 @@ package farm.query.vgi.hl7;
 import farm.query.vgi.function.ArgSpec;
 import farm.query.vgi.function.Arguments;
 import farm.query.vgi.function.FunctionMetadata;
+import farm.query.vgi.protocol.FunctionExample;
 import farm.query.vgi.internal.SchemaUtil;
 import farm.query.vgi.protocol.BindResponse;
 import farm.query.vgi.table.TableBindParams;
@@ -34,12 +35,31 @@ public final class FieldsFunction implements TableFunction {
     @Override public String name() { return "hl7_fields"; }
 
     @Override public FunctionMetadata metadata() {
+        String q = "SELECT field, value FROM hl7.main.hl7_fields(" + Examples.SAMPLE_MSG_SQL
+                + ") WHERE segment = 'PID';";
+        String desc = "List every field of the PID (patient identification) segment as "
+                + "long-format rows.";
         return FunctionMetadata.describe(
                         "Explode an HL7 v2.x message into long format: one row per field value "
                                 + "(repetitions expanded), keyed by segment, segment occurrence, field, and "
                                 + "repetition. Component structure is preserved in the raw value text.")
-                .withCategories("hl7", "healthcare", "parsing");
+                .withCategories("hl7", "healthcare", "parsing")
+                .withTag("vgi.columns_md", COLUMNS_MD)
+                .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
+                .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }
+
+    /** Markdown table of the returned columns (static schema, same for every call). */
+    private static final String COLUMNS_MD =
+            "| column | type | description |\n"
+                    + "| --- | --- | --- |\n"
+                    + "| `segment` | VARCHAR | 3-letter segment identifier (e.g. MSH, PID). |\n"
+                    + "| `segment_rep` | INTEGER | 0-based occurrence index of this segment within "
+                    + "the message. |\n"
+                    + "| `field` | INTEGER | 1-based HL7 field number within the segment. |\n"
+                    + "| `repetition` | INTEGER | 0-based repetition index of the field value. |\n"
+                    + "| `value` | VARCHAR | Raw field-value text (component/subcomponent structure "
+                    + "preserved). |";
 
     @Override public List<ArgSpec> argumentSpecs() {
         return List.of(ArgSpec.any("message", 0, List.of()));
