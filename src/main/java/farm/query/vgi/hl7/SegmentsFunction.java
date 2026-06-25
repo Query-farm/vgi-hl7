@@ -61,8 +61,7 @@ public final class SegmentsFunction implements TableFunction {
                                 + "input simply produces no rows. See `vgi.result_columns_md` for "
                                 + "the returned columns.",
                         "hl7 segments, split message, segment list, MSH, PID, PV1, parse hl7, "
-                                + "segment id, message structure, hl7 v2",
-                        "SegmentsFunction.java"))
+                                + "segment id, message structure, hl7 v2"))
                 .withTag("vgi.result_columns_md", COLUMNS_MD)
                 .withTag("vgi.executable_examples", Examples.EXECUTABLE_EXAMPLES)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
@@ -82,7 +81,14 @@ public final class SegmentsFunction implements TableFunction {
     @Override public List<ArgSpec> argumentSpecs() {
         // Polymorphic message arg: an any-typed positional so DuckDB binds both a
         // VARCHAR message and a BLOB/BINARY of bytes; resolved via MessageInput.
-        return List.of(ArgSpec.any("message", 0, List.of()));
+        // Built like ArgSpec.any(...) but with a per-argument doc (VGI312).
+        return List.of(new ArgSpec(
+                "message", 0, new org.apache.arrow.vector.types.pojo.ArrowType.Null(),
+                "The HL7 v2.x message to split, supplied inline as the message itself (either "
+                        + "its text or its raw bytes), never a file path. Segments are separated "
+                        + "by carriage returns and the first must be MSH. NULL or malformed input "
+                        + "(no leading MSH) yields no rows.",
+                false, false, "", List.of(), false, true, false));
     }
 
     @Override public BindResponse onBind(TableBindParams p) {

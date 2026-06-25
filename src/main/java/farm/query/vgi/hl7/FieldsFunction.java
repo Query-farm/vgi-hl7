@@ -71,8 +71,7 @@ public final class FieldsFunction implements TableFunction {
                                 + "encoding characters. MSH-1/MSH-2 are kept verbatim. See "
                                 + "`vgi.result_columns_md` for the returned columns.",
                         "hl7 fields, long format, tidy, unpivot, explode, repetitions, field value, "
-                                + "segment_rep, component, subcomponent, parse hl7, hl7 v2",
-                        "FieldsFunction.java"))
+                                + "segment_rep, component, subcomponent, parse hl7, hl7 v2"))
                 .withTag("vgi.result_columns_md", COLUMNS_MD)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
@@ -91,7 +90,14 @@ public final class FieldsFunction implements TableFunction {
                     + "preserved). |";
 
     @Override public List<ArgSpec> argumentSpecs() {
-        return List.of(ArgSpec.any("message", 0, List.of()));
+        // Built like ArgSpec.any(...) but with a per-argument doc (VGI312).
+        return List.of(new ArgSpec(
+                "message", 0, new org.apache.arrow.vector.types.pojo.ArrowType.Null(),
+                "The HL7 v2.x message to explode into long format, supplied inline as the "
+                        + "message itself (either its text or its raw bytes), never a file path. "
+                        + "Every field of every segment becomes a row, with repeating fields "
+                        + "expanded; NULL or malformed input yields no rows.",
+                false, false, "", List.of(), false, true, false));
     }
 
     @Override public BindResponse onBind(TableBindParams p) {

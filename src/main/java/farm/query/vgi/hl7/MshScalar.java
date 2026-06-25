@@ -48,7 +48,7 @@ abstract class MshScalar extends ScalarFn {
     @Override public final FunctionMetadata metadata() {
         return FunctionMetadata.describe(description)
                 .withCategories("hl7", "healthcare")
-                .withTags(Meta.objectTags(title, docLlm, docMd, keywords, "MshScalar.java"))
+                .withTags(Meta.objectTags(title, docLlm, docMd, keywords))
                 .withExamples(java.util.List.of(example))
                 .withTag("vgi.example_queries",
                         Examples.exampleQueriesTag(example.sql(), example.description()));
@@ -103,7 +103,12 @@ abstract class MshScalar extends ScalarFn {
                     "hl7 message type, MSH-9, trigger event, ADT, ORU, ORM, message kind, "
                             + "routing, dispatch, parse hl7, hl7 v2");
         }
-        public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
+        public void compute(@Vector(value = "message", any = true,
+                                    doc = "The HL7 v2.x message to read MSH-9 from, supplied "
+                                            + "inline as the message itself (either its text or "
+                                            + "its raw bytes), never a file path. Evaluated per "
+                                            + "row; NULL or malformed input yields NULL.")
+                            FieldVector in, VarCharVector out) {
             run(in, out);
         }
     }
@@ -131,7 +136,12 @@ abstract class MshScalar extends ScalarFn {
                     "hl7 version, MSH-12, version id, 2.3, 2.5, 2.7, standard release, "
                             + "conformance, parse hl7, hl7 v2");
         }
-        public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
+        public void compute(@Vector(value = "message", any = true,
+                                    doc = "The HL7 v2.x message to read MSH-12 from, supplied "
+                                            + "inline as the message itself (either its text or "
+                                            + "its raw bytes), never a file path. Evaluated per "
+                                            + "row; NULL or malformed input yields NULL.")
+                            FieldVector in, VarCharVector out) {
             run(in, out);
         }
     }
@@ -160,7 +170,12 @@ abstract class MshScalar extends ScalarFn {
                     "hl7 control id, MSH-10, message control id, ACK, MSA-2, dedupe, "
                             + "deduplication, tracking, correlation, parse hl7, hl7 v2");
         }
-        public void compute(@Vector(value = "message", any = true) FieldVector in, VarCharVector out) {
+        public void compute(@Vector(value = "message", any = true,
+                                    doc = "The HL7 v2.x message to read MSH-10 from, supplied "
+                                            + "inline as the message itself (either its text or "
+                                            + "its raw bytes), never a file path. Evaluated per "
+                                            + "row; NULL or malformed input yields NULL.")
+                            FieldVector in, VarCharVector out) {
             run(in, out);
         }
     }

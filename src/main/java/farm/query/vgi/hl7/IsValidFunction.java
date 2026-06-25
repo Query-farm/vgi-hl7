@@ -49,8 +49,7 @@ public final class IsValidFunction extends ScalarFn {
                                 + "`false` rather than raising, and NULL maps to NULL. Pair it with "
                                 + "a `WHERE` clause to skip non-HL7 rows before parsing.",
                         "is valid hl7, validate, well-formed, MSH, sniff, gate, predicate, "
-                                + "verify message, parse hl7, hl7 v2",
-                        "IsValidFunction.java"))
+                                + "verify message, parse hl7, hl7 v2"))
                 .withExamples(java.util.List.of(
                         new FunctionExample(okQuery,
                                 "Check that a well-formed ADT^A01 message validates.", "true"),
@@ -65,7 +64,13 @@ public final class IsValidFunction extends ScalarFn {
         return Schemas.BOOL;
     }
 
-    public void compute(@Vector(value = "message", any = true) FieldVector in, BitVector out) {
+    public void compute(@Vector(value = "message", any = true,
+                                doc = "The candidate HL7 text to test, supplied inline as the "
+                                        + "message itself (either its text or its raw bytes), "
+                                        + "never a file path. Evaluated per row; returns true for "
+                                        + "a well-formed HL7 v2.x message, false for malformed "
+                                        + "text, and NULL for NULL input.")
+                        FieldVector in, BitVector out) {
         int n = in.getValueCount();
         for (int i = 0; i < n; i++) {
             String message = MessageInput.at(in, i);

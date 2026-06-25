@@ -35,8 +35,10 @@ public final class Main {
         tags.put("vgi.title", "HL7 v2.x Clinical Message Parser");
         tags.put(
                 "vgi.keywords",
-                "hl7, hl7 v2, hl7v2, healthcare, clinical, interoperability, ADT, ORU, ORM, MSH, "
-                        + "PID, segment, field, pipe-delimited, parse, message, EHR, EMR, HL7 location");
+                Meta.keywordsJson(
+                        "hl7, hl7 v2, hl7v2, healthcare, clinical, interoperability, ADT, ORU, "
+                                + "ORM, MSH, PID, segment, field, pipe-delimited, parse, message, "
+                                + "EHR, EMR, HL7 location"));
         tags.put(
                 "vgi.doc_llm",
                 "Parse and query HL7 v2.x pipe-delimited clinical messages (ADT, ORU, ORM, "
@@ -70,15 +72,16 @@ public final class Main {
         tags.put("vgi.title", "HL7 v2.x Parsing — main");
         tags.put(
                 "vgi.keywords",
-                "hl7, hl7 v2, healthcare, clinical, segments, fields, hl7_get, hl7_segments, "
-                        + "hl7_fields, hl7_message_type, hl7_version, is_valid_hl7, MSH, PID, location");
+                Meta.keywordsJson(
+                        "hl7, hl7 v2, healthcare, clinical, segments, fields, hl7_get, "
+                                + "hl7_segments, hl7_fields, hl7_message_type, hl7_version, "
+                                + "is_valid_hl7, MSH, PID, location"));
         // VGI123 classifying tags — BARE keys (not vgi.-namespaced).
         tags.put("domain", "healthcare");
         tags.put("category", "parsing");
         tags.put("topic", "hl7-v2-clinical-messaging");
-        tags.put(
-                "vgi.source_url",
-                "https://github.com/Query-farm/vgi-hl7/blob/main/src/main/java/farm/query/vgi/hl7/Main.java");
+        // VGI139: source_url lives only on the catalog object (Worker.sourceUrl);
+        // not repeated per-schema/per-object.
         tags.put(
                 "vgi.doc_llm",
                 "HL7 v2.x message-parsing functions: split a message into segments, explode it "

@@ -60,8 +60,7 @@ public final class GetFunction extends ScalarFn {
                                 + "Missing/invalid locations return NULL rather than erroring, so "
                                 + "it is safe to run across dirty data.",
                         "hl7 get, extract, location, PID-5, MSH-9, component, subcomponent, "
-                                + "accessor, field path, pluck value, parse hl7, hl7 v2",
-                        "GetFunction.java"))
+                                + "accessor, field path, pluck value, parse hl7, hl7 v2"))
                 .withExamples(java.util.List.of(
                         new FunctionExample(getPid,
                                 "Extract the patient's family name (component 1 of PID-5).", "Doe"),
@@ -76,8 +75,18 @@ public final class GetFunction extends ScalarFn {
         return Schemas.UTF8;
     }
 
-    public void compute(@Vector(value = "message", any = true) FieldVector in,
-                        @Const("location") String location,
+    public void compute(@Vector(value = "message", any = true,
+                                doc = "The HL7 v2.x message to read from, supplied inline as the "
+                                        + "message itself (either its text or its raw bytes), "
+                                        + "never a file path. Evaluated per row; NULL or malformed "
+                                        + "input yields NULL.") FieldVector in,
+                        @Const(value = "location",
+                               doc = "The HL7 location to extract, as a constant string. Grammar: "
+                                       + "SEG-field[.component[.subcomponent]] with an optional "
+                                       + "segment repetition, e.g. 'PID-5', 'PID-5.1', 'MSH-9.1.2', "
+                                       + "or 'DG1[2]-3'. Field/component/subcomponent indices are "
+                                       + "1-based; an invalid location yields NULL.")
+                        String location,
                         VarCharVector out) {
         Hl7Location loc = Hl7Location.parse(location);
         int n = in.getValueCount();
