@@ -51,6 +51,7 @@ public final class Main {
         tags.put(
                 "vgi.doc_md",
                 "# HL7 v2.x Clinical Message Parsing in SQL\n\n"
+                        + "![HL7 International logo](https://brandguide.hl7.org/wp-content/uploads/sites/5/2025/07/HL7-V2Primary-Logo600px.png)\n\n"
                         + "Parse, validate, and query **HL7 v2.x** pipe-delimited clinical messages "
                         + "directly in DuckDB SQL — turn raw ADT, ORU, and ORM feeds into queryable "
                         + "rows over Apache Arrow, with no ETL pipeline and no heavyweight HL7 "
