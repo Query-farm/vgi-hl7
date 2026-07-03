@@ -48,6 +48,7 @@ abstract class MshScalar extends ScalarFn {
     @Override public final FunctionMetadata metadata() {
         return FunctionMetadata.describe(description)
                 .withCategories("hl7", "healthcare")
+                .withTag("vgi.category", "extraction")
                 .withTags(Meta.objectTags(title, docLlm, docMd, keywords))
                 .withExamples(java.util.List.of(example))
                 .withTag("vgi.example_queries",

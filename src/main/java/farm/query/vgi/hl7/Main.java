@@ -61,9 +61,19 @@ public final class Main {
                         + "from EHR/EMR systems, interface engines, or message archives and analyze "
                         + "them with plain SQL. HL7 v2 is the most widely deployed healthcare "
                         + "messaging standard in the world, and its segment/field/component/"
-                        + "subcomponent layout is notoriously fiddly to parse by hand. `hl7` does "
-                        + "that parsing for you so you can JOIN, filter, and aggregate clinical "
-                        + "fields the same way you would any other table.\n\n"
+                        + "subcomponent layout is notoriously fiddly to parse by hand. Reach for it "
+                        + "whenever a clinical feed arrives as raw pipe-delimited text and you want "
+                        + "to JOIN, filter, and aggregate its fields the same way you would any "
+                        + "other table — rather than pre-processing the messages in an external "
+                        + "language first.\n\n"
+                        + "The core concepts mirror the HL7 v2 grammar. A **message** is a sequence "
+                        + "of carriage-return–separated **segments** (MSH, EVN, PID, PV1, OBX, ...), "
+                        + "each of which is a list of **fields**; a field can carry repetitions and "
+                        + "decomposes further into **components** and **subcomponents**. Individual "
+                        + "elements are addressed by an **HL7 location** path such as `PID-5.1` "
+                        + "(component 1 of field 5 of the PID segment) or `MSH-9`, optionally with a "
+                        + "segment repetition like `DG1[2]-3`. Indices are 1-based per HL7 "
+                        + "convention.\n\n"
                         + "Under the hood the parser is a compact, pure-Java (pure-JDK) "
                         + "implementation — there is **no HAPI dependency**, keeping the worker "
                         + "MIT-licensed and dependency-light. It is fully **MSH-driven**: the field "
@@ -71,23 +81,14 @@ public final class Main {
                         + "escape, and subcomponent delimiters) are read from each message rather "
                         + "than assumed, so non-standard delimiters are handled correctly. Malformed "
                         + "input never crashes the worker — it simply parses as invalid and yields "
-                        + "no rows. The format and message grammar follow the official **HL7 v2** "
-                        + "standard published by [Health Level Seven International](https://www.hl7.org); "
-                        + "see the [HL7 v2 product brief and documentation]("
+                        + "no rows, so the functions are safe to run across dirty, mixed-quality "
+                        + "feeds.\n\n"
+                        + "The format and message grammar follow the official **HL7 v2** standard "
+                        + "published by [Health Level Seven International](https://www.hl7.org); see "
+                        + "the [HL7 v2 product brief and documentation]("
                         + "https://www.hl7.org/implement/standards/product_brief.cfm?product_id=185) "
-                        + "for the canonical segment, field, and message-type definitions.\n\n"
-                        + "**Table functions** explode a message into rows: `hl7_segments(message)` "
-                        + "returns one row per segment (MSH, PID, OBX, ...), and "
-                        + "`hl7_fields(message)` returns long format — one row per field value with "
-                        + "repetitions expanded — for set-based querying. **Scalar functions** pull "
-                        + "out individual values: `hl7_get(message, location)` extracts a value by "
-                        + "HL7 location such as `'PID-5.1'`, `'MSH-9'`, or `'DG1[2]-3'`; "
-                        + "`hl7_message_type` reads MSH-9, `hl7_version` reads MSH-12, and "
-                        + "`hl7_message_control_id` reads MSH-10; and `is_valid_hl7(message)` returns "
-                        + "a BOOLEAN for quick validation and filtering. A typical workflow is "
-                        + "`SELECT hl7_get(msg, 'PID-5.1') AS patient_name FROM feed WHERE "
-                        + "is_valid_hl7(msg) AND hl7_message_type(msg) = 'ADT^A01'`. Source code, "
-                        + "examples, and issues live in the "
+                        + "for the canonical segment, field, and message-type definitions. Source "
+                        + "code, examples, and issues live in the "
                         + "[Query-farm/vgi-hl7 repository](https://github.com/Query-farm/vgi-hl7).");
         tags.put("vgi.author", "Query.Farm");
         tags.put("vgi.copyright", "Copyright 2026 Query Farm LLC - https://query.farm");
@@ -96,6 +97,8 @@ public final class Main {
         tags.put(
                 "vgi.support_policy_url",
                 "https://github.com/Query-farm/vgi-hl7/blob/main/README.md");
+        // VGI152/VGI407/VGI920: agent-suitability suite for `vgi-lint simulate`.
+        tags.put("vgi.agent_test_tasks", Examples.AGENT_TEST_TASKS);
         return tags;
     }
 
@@ -123,12 +126,29 @@ public final class Main {
         tags.put(
                 "vgi.doc_md",
                 "## HL7 v2.x parsing functions\n\n"
-                        + "Clinical-message parsing over Apache Arrow: segment splitting "
-                        + "(`hl7_segments`), long-format field explosion (`hl7_fields`), "
-                        + "location extraction (`hl7_get`), MSH accessors "
-                        + "(`hl7_message_type`/`hl7_version`/`hl7_message_control_id`), and "
-                        + "validation (`is_valid_hl7`). The parser is pure-JDK and MSH-driven "
-                        + "(separators are read from the message, not assumed).");
+                        + "Clinical-message parsing over Apache Arrow. The functions in this schema "
+                        + "fall into three capability areas that mirror how you work with an HL7 v2 "
+                        + "feed.\n\n"
+                        + "**Parsing** turns a raw message into rows: one row per segment, or a "
+                        + "long-format explosion with one row per field value (repetitions "
+                        + "expanded), so you can query a message set-wise instead of by hand.\n\n"
+                        + "**Extraction** pulls out individual values addressed by an HL7 location "
+                        + "path (such as `PID-5.1` or `MSH-9`), including the common MSH header "
+                        + "accessors for message type, version, and control id.\n\n"
+                        + "**Validation** tests whether text is a well-formed HL7 v2 message, which "
+                        + "is handy for filtering dirty feeds before parsing. The parser is pure-JDK "
+                        + "and MSH-driven — the field separator and encoding characters are read "
+                        + "from each message rather than assumed.");
+        // VGI413/VGI408/VGI409: ordered category registry for schema navigation/SEO.
+        // Each object joins by its `vgi.category` name.
+        tags.put(
+                "vgi.categories",
+                "[{\"name\":\"parsing\",\"title\":\"Parsing\","
+                        + "\"description\":\"Explode a message into segment or long-format field rows.\"},"
+                        + "{\"name\":\"extraction\",\"title\":\"Extraction\","
+                        + "\"description\":\"Pull individual values out by HL7 location or MSH header accessor.\"},"
+                        + "{\"name\":\"validation\",\"title\":\"Validation\","
+                        + "\"description\":\"Test whether text is a well-formed HL7 v2 message.\"}]");
         tags.put("vgi.example_queries", Examples.SCHEMA_EXAMPLE_QUERIES);
         return tags;
     }

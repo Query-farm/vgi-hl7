@@ -44,6 +44,7 @@ public final class FieldsFunction implements TableFunction {
                                 + "(repetitions expanded), keyed by segment, segment occurrence, field, and "
                                 + "repetition. Component structure is preserved in the raw value text.")
                 .withCategories("hl7", "healthcare", "parsing")
+                .withTag("vgi.category", "parsing")
                 .withTags(Meta.objectTags(
                         "Explode HL7 Message Into Field Rows",
                         "Explodes an HL7 v2.x message into long (tidy) format: one row per field "

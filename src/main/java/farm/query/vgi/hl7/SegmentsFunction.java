@@ -39,6 +39,7 @@ public final class SegmentsFunction implements TableFunction {
                         "Split an HL7 v2.x message into its segments: one row per segment with its "
                                 + "3-letter id, field count, and raw text.")
                 .withCategories("hl7", "healthcare", "parsing")
+                .withTag("vgi.category", "parsing")
                 .withTags(Meta.objectTags(
                         "Split HL7 Message Into Segments",
                         "Splits an HL7 v2.x message into its constituent segments, returning one "

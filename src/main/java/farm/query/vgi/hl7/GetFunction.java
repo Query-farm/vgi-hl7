@@ -37,6 +37,7 @@ public final class GetFunction extends ScalarFn {
         String getMsh = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'MSH-9');";
         return FunctionMetadata.describe(description())
                 .withCategories("hl7", "healthcare", "extraction")
+                .withTag("vgi.category", "extraction")
                 .withTags(Meta.objectTags(
                         "Extract HL7 Value By Location",
                         "Extracts a single value from an HL7 v2.x message addressed by an HL7 "

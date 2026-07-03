@@ -31,6 +31,7 @@ public final class IsValidFunction extends ScalarFn {
         String badQuery = "SELECT hl7.main.is_valid_hl7('not an hl7 message');";
         return FunctionMetadata.describe(description())
                 .withCategories("hl7", "healthcare", "validation")
+                .withTag("vgi.category", "validation")
                 .withTags(Meta.objectTags(
                         "Validate HL7 v2 Message",
                         "Tests whether text parses as a well-formed HL7 v2.x message: it must begin "
