@@ -148,7 +148,9 @@ public final class Main {
                         + "{\"name\":\"extraction\",\"title\":\"Extraction\","
                         + "\"description\":\"Pull individual values out by HL7 location or MSH header accessor.\"},"
                         + "{\"name\":\"validation\",\"title\":\"Validation\","
-                        + "\"description\":\"Test whether text is a well-formed HL7 v2 message.\"}]");
+                        + "\"description\":\"Test whether text is a well-formed HL7 v2 message.\"},"
+                        + "{\"name\":\"reference\",\"title\":\"Reference\","
+                        + "\"description\":\"Browsable catalogs of curated sample data (e.g. example messages).\"}]");
         tags.put("vgi.example_queries", Examples.SCHEMA_EXAMPLE_QUERIES);
         return tags;
     }
@@ -162,6 +164,7 @@ public final class Main {
                 .sourceUrl("https://github.com/Query-farm/vgi-hl7")
                 .schemaComment("main", "HL7 v2.x message-parsing functions.")
                 .schemaTags("main", schemaTags())
+                .registerView(ExampleMessages.view())
                 .registerTable(new SegmentsFunction())
                 .registerTable(new FieldsFunction())
                 .registerScalar(new GetFunction())

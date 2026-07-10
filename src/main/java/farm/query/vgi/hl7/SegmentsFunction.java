@@ -59,25 +59,26 @@ public final class SegmentsFunction implements TableFunction {
                                 + "Handy for discovering a message's structure before extracting "
                                 + "fields.\n\n"
                                 + "Pass the message inline as a VARCHAR/BLOB. Malformed or NULL "
-                                + "input simply produces no rows. See `vgi.result_columns_md` for "
-                                + "the returned columns.",
+                                + "input simply produces no rows. The returned columns are listed "
+                                + "in this function's result schema.",
                         "hl7 segments, split message, segment list, MSH, PID, PV1, parse hl7, "
                                 + "segment id, message structure, hl7 v2"))
-                .withTag("vgi.result_columns_md", COLUMNS_MD)
+                .withTag("vgi.result_columns_schema", COLUMNS_SCHEMA)
                 .withTag("vgi.executable_examples", Examples.EXECUTABLE_EXAMPLES)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }
 
-    /** Markdown table of the returned columns (static schema, same for every call). */
-    private static final String COLUMNS_MD =
-            "| column | type | description |\n"
-                    + "| --- | --- | --- |\n"
-                    + "| `seq` | INTEGER | 1-based ordinal of the segment within the message. |\n"
-                    + "| `segment` | VARCHAR | 3-letter segment identifier (e.g. MSH, PID, PV1). |\n"
-                    + "| `field_count` | INTEGER | Number of fields in the segment (HL7 numbering; "
-                    + "MSH-1 counts). |\n"
-                    + "| `raw` | VARCHAR | Raw text of the entire segment. |";
+    /** Structured result schema (static — same columns for every call) for VGI307. */
+    private static final String COLUMNS_SCHEMA =
+            "[{\"name\":\"seq\",\"type\":\"INTEGER\","
+                    + "\"description\":\"1-based ordinal of the segment within the message.\"},"
+                    + "{\"name\":\"segment\",\"type\":\"VARCHAR\","
+                    + "\"description\":\"3-letter segment identifier (e.g. MSH, PID, PV1).\"},"
+                    + "{\"name\":\"field_count\",\"type\":\"INTEGER\","
+                    + "\"description\":\"Number of fields in the segment (HL7 numbering; MSH-1 counts).\"},"
+                    + "{\"name\":\"raw\",\"type\":\"VARCHAR\","
+                    + "\"description\":\"Raw text of the entire segment.\"}]";
 
     @Override public List<ArgSpec> argumentSpecs() {
         // Polymorphic message arg: an any-typed positional so DuckDB binds both a

@@ -2,7 +2,7 @@ plugins {
     java
     application
     // Fat/shaded JAR: `./gradlew shadowJar` -> build/libs/vgi-hl7-<ver>-all.jar
-    id("com.gradleup.shadow") version "9.4.2"
+    id("com.gradleup.shadow") version "9.5.1"
 }
 
 group = "farm.query"
@@ -41,15 +41,15 @@ dependencies {
     // parser dependency: the parser is pure JDK (see Hl7Message). In particular
     // we deliberately do NOT depend on the HAPI HL7v2 library, whose licensing is
     // murky for commercial use. This keeps vgi-hl7 MIT and dependency-light.
-    implementation("farm.query:vgi:0.10.0")
-    implementation("farm.query:vgirpc:0.12.0")
+    implementation("farm.query:vgi:0.16.0")
+    implementation("farm.query:vgirpc:0.15.0")
 
     // slf4j-simple sends ALL log output to System.err. The stdio Arrow-IPC
     // transport owns System.out, so anything written to stdout corrupts the
     // stream and hangs the worker; routing logging to stderr keeps stdout clean.
-    implementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation("org.slf4j:slf4j-simple:2.0.18")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

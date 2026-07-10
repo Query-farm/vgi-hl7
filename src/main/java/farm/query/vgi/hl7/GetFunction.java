@@ -82,11 +82,17 @@ public final class GetFunction extends ScalarFn {
                                         + "never a file path. Evaluated per row; NULL or malformed "
                                         + "input yields NULL.") FieldVector in,
                         @Const(value = "location",
-                               doc = "The HL7 location to extract, as a constant string. Grammar: "
-                                       + "SEG-field[.component[.subcomponent]] with an optional "
-                                       + "segment repetition, e.g. 'PID-5', 'PID-5.1', 'MSH-9.1.2', "
-                                       + "or 'DG1[2]-3'. Field/component/subcomponent indices are "
-                                       + "1-based; an invalid location yields NULL.")
+                               doc = "The HL7 location path identifying the value to extract, "
+                                       + "supplied as a constant string. A path addresses a value "
+                                       + "by naming a segment and a field number within it, and may "
+                                       + "optionally drill deeper into a component and then a "
+                                       + "subcomponent of that field, as well as pick which repeated "
+                                       + "occurrence of the segment to read. Indices are numbered "
+                                       + "from one per HL7 convention. The path is an open-ended "
+                                       + "grammar spanning arbitrary HL7 segments, not a short fixed "
+                                       + "vocabulary; the function documentation gives the full "
+                                       + "syntax and worked examples. An unparseable or absent path "
+                                       + "yields NULL.")
                         String location,
                         VarCharVector out) {
         Hl7Location loc = Hl7Location.parse(location);

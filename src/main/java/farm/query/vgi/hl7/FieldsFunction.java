@@ -69,26 +69,27 @@ public final class FieldsFunction implements TableFunction {
                                 + "ordinary SQL.\n\n"
                                 + "Component/subcomponent structure stays intact in `value`; "
                                 + "decompose it further with `hl7_get` or by splitting on the "
-                                + "encoding characters. MSH-1/MSH-2 are kept verbatim. See "
-                                + "`vgi.result_columns_md` for the returned columns.",
+                                + "encoding characters. MSH-1/MSH-2 are kept verbatim. The returned "
+                                + "columns are listed in this function's result schema.",
                         "hl7 fields, long format, tidy, unpivot, explode, repetitions, field value, "
                                 + "segment_rep, component, subcomponent, parse hl7, hl7 v2"))
-                .withTag("vgi.result_columns_md", COLUMNS_MD)
+                .withTag("vgi.result_columns_schema", COLUMNS_SCHEMA)
                 .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
     }
 
-    /** Markdown table of the returned columns (static schema, same for every call). */
-    private static final String COLUMNS_MD =
-            "| column | type | description |\n"
-                    + "| --- | --- | --- |\n"
-                    + "| `segment` | VARCHAR | 3-letter segment identifier (e.g. MSH, PID). |\n"
-                    + "| `segment_rep` | INTEGER | 0-based occurrence index of this segment within "
-                    + "the message. |\n"
-                    + "| `field` | INTEGER | 1-based HL7 field number within the segment. |\n"
-                    + "| `repetition` | INTEGER | 0-based repetition index of the field value. |\n"
-                    + "| `value` | VARCHAR | Raw field-value text (component/subcomponent structure "
-                    + "preserved). |";
+    /** Structured result schema (static — same columns for every call) for VGI307. */
+    private static final String COLUMNS_SCHEMA =
+            "[{\"name\":\"segment\",\"type\":\"VARCHAR\","
+                    + "\"description\":\"3-letter segment identifier (e.g. MSH, PID).\"},"
+                    + "{\"name\":\"segment_rep\",\"type\":\"INTEGER\","
+                    + "\"description\":\"0-based occurrence index of this segment within the message.\"},"
+                    + "{\"name\":\"field\",\"type\":\"INTEGER\","
+                    + "\"description\":\"1-based HL7 field number within the segment.\"},"
+                    + "{\"name\":\"repetition\",\"type\":\"INTEGER\","
+                    + "\"description\":\"0-based repetition index of the field value.\"},"
+                    + "{\"name\":\"value\",\"type\":\"VARCHAR\","
+                    + "\"description\":\"Raw field-value text (component/subcomponent structure preserved).\"}]";
 
     @Override public List<ArgSpec> argumentSpecs() {
         // Built like ArgSpec.any(...) but with a per-argument doc (VGI312).

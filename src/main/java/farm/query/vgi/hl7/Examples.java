@@ -21,6 +21,19 @@ final class Examples {
                     + "PID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I'";
 
     /**
+     * A minimal ORU^R01 (unsolicited observation result) message as a DuckDB
+     * {@code E'...'} literal, CR-delimited: an OBR order plus two OBX result
+     * segments. Used to give the browsable {@code example_messages} view a second,
+     * structurally different sample beyond the ADT admit.
+     */
+    static final String ORU_MSG_SQL =
+            "E'MSH|^~\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\r"
+                    + "PID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\r"
+                    + "OBR|1||ORD123|CBC^Complete Blood Count\\r"
+                    + "OBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\r"
+                    + "OBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N'";
+
+    /**
      * Guaranteed-runnable, catalog-qualified examples (VGI509) attached to one
      * object. Each {@code sql} is self-contained and re-runnable against an
      * attached {@code hl7} worker; {@code expected_result} is omitted on purpose
@@ -90,6 +103,15 @@ final class Examples {
                         true)
                 + ","
                 + taskJson(
+                        "pid_fields_long",
+                        "Here is an HL7 v2 message:\n" + SAMPLE_MSG_TEXT + "\n\n"
+                                + "Explode the PID segment into long format: return the 1-based "
+                                + "field number and the field value, one row per field value.",
+                        "SELECT field, value FROM hl7.main.hl7_fields(" + e + ") "
+                                + "WHERE segment = 'PID' ORDER BY field, repetition",
+                        true)
+                + ","
+                + taskJson(
                         "patient_family_name",
                         "Given this HL7 v2 message:\n" + SAMPLE_MSG_TEXT + "\n\n"
                                 + "What is the patient's family (last) name? Return the single "
@@ -120,6 +142,14 @@ final class Examples {
                                 + "\n\nReturn the single boolean validation result.",
                         "SELECT hl7.main.is_valid_hl7(" + e + ") AS ok",
                         false)
+                + ","
+                + taskJson(
+                        "list_example_messages",
+                        "This worker ships a built-in catalog of ready-to-use example HL7 v2 "
+                                + "messages. List the message type of each built-in example, one "
+                                + "per row.",
+                        "SELECT message_type FROM hl7.main.example_messages ORDER BY name",
+                        true)
                 + "]";
     }
 
