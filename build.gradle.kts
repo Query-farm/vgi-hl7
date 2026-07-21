@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "farm.query"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     // The VGI Java SDK is published to Maven Central as farm.query:vgi /
@@ -41,8 +41,8 @@ dependencies {
     // parser dependency: the parser is pure JDK (see Hl7Message). In particular
     // we deliberately do NOT depend on the HAPI HL7v2 library, whose licensing is
     // murky for commercial use. This keeps vgi-hl7 MIT and dependency-light.
-    implementation("farm.query:vgi:0.16.0")
-    implementation("farm.query:vgirpc:0.15.0")
+    implementation("farm.query:vgi:0.19.0")
+    implementation("farm.query:vgirpc:0.16.0")
 
     // slf4j-simple sends ALL log output to System.err. The stdio Arrow-IPC
     // transport owns System.out, so anything written to stdout corrupts the

@@ -61,7 +61,7 @@ public final class FieldsFunction implements TableFunction {
                                 + "separator) and MSH-2 (the encoding characters, which literally "
                                 + "contain `~`) are emitted as single verbatim values and are not "
                                 + "re-split on the repetition separator. The `message` argument is a "
-                                + "VARCHAR text or BLOB bytes; NULL or malformed input yields no "
+                                + "`VARCHAR` text or `BLOB` bytes; NULL or malformed input yields no "
                                 + "rows.",
                         "## hl7_fields\n\n"
                                 + "Unpivots a whole HL7 v2.x message into long format — one row per "

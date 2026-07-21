@@ -51,14 +51,14 @@ public final class SegmentsFunction implements TableFunction {
                                 + "Use it as the first step when ingesting a feed: enumerate what "
                                 + "segments a message contains before drilling into fields with "
                                 + "`hl7_fields` or `hl7_get`. The `message` argument is polymorphic — "
-                                + "a VARCHAR carrying the message text or a BLOB carrying its bytes. "
+                                + "a `VARCHAR` carrying the message text or a `BLOB` carrying its bytes. "
                                 + "NULL or malformed input (no leading MSH) yields no rows; the "
                                 + "worker never throws.",
                         "## hl7_segments\n\n"
                                 + "Returns one row per segment of an HL7 v2.x message, in order. "
                                 + "Handy for discovering a message's structure before extracting "
                                 + "fields.\n\n"
-                                + "Pass the message inline as a VARCHAR/BLOB. Malformed or NULL "
+                                + "Pass the message inline as a `VARCHAR`/`BLOB`. Malformed or NULL "
                                 + "input simply produces no rows. The returned columns are listed "
                                 + "in this function's result schema.",
                         "hl7 segments, split message, segment list, MSH, PID, PV1, parse hl7, "

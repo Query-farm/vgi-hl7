@@ -164,16 +164,29 @@ final class Examples {
                 + "}";
     }
 
-    /** Representative catalog-qualified example queries for the schema (VGI506), a plain string. */
+    /**
+     * Representative catalog-qualified example queries for the schema (VGI506), as
+     * a JSON array of {@code {"sql", "description"}} objects so every example
+     * carries a non-empty human-readable description (VGI515).
+     */
     static final String SCHEMA_EXAMPLE_QUERIES =
-            "SELECT * FROM hl7.main.hl7_segments(" + SAMPLE_MSG_SQL + ");\n"
-                    + "SELECT segment, field, repetition, value FROM hl7.main.hl7_fields("
-                    + SAMPLE_MSG_SQL + ") WHERE segment = 'PID';\n"
-                    + "SELECT hl7.main.hl7_get(" + SAMPLE_MSG_SQL + ", 'PID-5.1');\n"
-                    + "SELECT hl7.main.hl7_message_type(" + SAMPLE_MSG_SQL + ");\n"
-                    + "SELECT hl7.main.hl7_version(" + SAMPLE_MSG_SQL + ");\n"
-                    + "SELECT hl7.main.hl7_message_control_id(" + SAMPLE_MSG_SQL + ");\n"
-                    + "SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ");";
+            exampleQueriesTag(
+                    "SELECT seq, segment, field_count FROM hl7.main.hl7_segments("
+                            + SAMPLE_MSG_SQL + ") ORDER BY seq",
+                    "Split an admit message into its segments, in message order.",
+                    "SELECT segment, field, repetition, value FROM hl7.main.hl7_fields("
+                            + SAMPLE_MSG_SQL + ") WHERE segment = 'PID' ORDER BY field, repetition",
+                    "Explode the PID segment into long-format field rows.",
+                    "SELECT hl7.main.hl7_get(" + SAMPLE_MSG_SQL + ", 'PID-5.1') AS family_name",
+                    "Extract the patient family name (component 1 of PID-5) by location.",
+                    "SELECT hl7.main.hl7_message_type(" + SAMPLE_MSG_SQL + ") AS message_type",
+                    "Read the message type (MSH-9) for routing a mixed feed.",
+                    "SELECT hl7.main.hl7_version(" + SAMPLE_MSG_SQL + ") AS version",
+                    "Read the HL7 version id (MSH-12) the message claims to conform to.",
+                    "SELECT hl7.main.hl7_message_control_id(" + SAMPLE_MSG_SQL + ") AS control_id",
+                    "Read the message control id (MSH-10) used for ACK correlation and dedupe.",
+                    "SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ") AS ok",
+                    "Validate that a well-formed HL7 v2 message parses.");
 
     /**
      * Build the value for a {@code vgi.example_queries} tag: a JSON array of

@@ -94,8 +94,8 @@ abstract class MshScalar extends ScalarFn {
                             + "order (ORM), etc.\n\n"
                             + "Use it to route or filter a mixed feed by message type. Returns the "
                             + "raw MSH-9 text, or NULL when the message is malformed or the field is "
-                            + "absent; NULL input yields NULL. The `message` argument is a VARCHAR "
-                            + "text or BLOB bytes.",
+                            + "absent; NULL input yields NULL. The `message` argument is a `VARCHAR` "
+                            + "text or `BLOB` bytes.",
                     "## hl7_message_type\n\n"
                             + "Returns MSH-9, the HL7 message type/trigger event (e.g. `ADT^A01`).\n\n"
                             + "The most common dispatch key in an HL7 v2 feed — use it to split or "
@@ -129,7 +129,7 @@ abstract class MshScalar extends ScalarFn {
                             + "Use it to branch parsing logic or to audit which versions a feed is "
                             + "sending. Returns the raw MSH-12 text, or NULL when the message is "
                             + "malformed or the field is absent; NULL input yields NULL. The "
-                            + "`message` argument is a VARCHAR text or BLOB bytes.",
+                            + "`message` argument is a `VARCHAR` text or `BLOB` bytes.",
                     "## hl7_version\n\n"
                             + "Returns MSH-12, the HL7 v2.x version id (e.g. `2.5`).\n\n"
                             + "Useful for version-aware handling and feed audits. Malformed or "
@@ -162,7 +162,7 @@ abstract class MshScalar extends ScalarFn {
                             + "Use it to correlate a message with its ACK, to dedupe a feed, or to "
                             + "trace a single message end to end. Returns the raw MSH-10 text, or "
                             + "NULL when the message is malformed or the field is absent; NULL input "
-                            + "yields NULL. The `message` argument is a VARCHAR text or BLOB bytes.",
+                            + "yields NULL. The `message` argument is a `VARCHAR` text or `BLOB` bytes.",
                     "## hl7_message_control_id\n\n"
                             + "Returns MSH-10, the message control id — the sender's unique id for "
                             + "the message, echoed in the ACK (MSA-2).\n\n"

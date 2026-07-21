@@ -42,7 +42,7 @@ public final class IsValidFunction extends ScalarFn {
                                 + "Use it as a cheap gate before parsing — e.g. filter a staging "
                                 + "table to rows that are actually HL7 v2 before calling "
                                 + "`hl7_segments`, `hl7_fields`, or `hl7_get`. The `message` "
-                                + "argument is a VARCHAR text or a BLOB of bytes.",
+                                + "argument is a `VARCHAR` text or a `BLOB` of bytes.",
                         "## is_valid_hl7\n\n"
                                 + "Boolean predicate: does this text look like an HL7 v2.x message "
                                 + "(leading MSH with separators and encoding chars)?\n\n"

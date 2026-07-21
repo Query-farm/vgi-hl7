@@ -53,6 +53,16 @@ SELECT
 ----
 ADT^A01	2.5	MSG00001
 
+# ---- segment repetition: address the Nth occurrence of a repeated segment ---
+# A lab result with two OBX rows; OBX[n] is 1-based (OBX[2] = the second OBX).
+
+query II
+SELECT
+  hl7.hl7_get(E'MSH|^~\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rOBR|1||ORD123|CBC^Complete Blood Count\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'OBX[1]-5'),
+  hl7.hl7_get(E'MSH|^~\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rOBR|1||ORD123|CBC^Complete Blood Count\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'OBX[2]-5');
+----
+7.2	14.1
+
 # ---- custom encoding chars (non-default MSH-2) ------------------------------
 
 # Field sep '#', component '*': PID-5.1 = SMITH.

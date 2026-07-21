@@ -35,6 +35,10 @@ public final class GetFunction extends ScalarFn {
     @Override public FunctionMetadata metadata() {
         String getPid = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'PID-5.1');";
         String getMsh = "SELECT hl7.main.hl7_get(" + Examples.SAMPLE_MSG_SQL + ", 'MSH-9');";
+        // Segment-repetition addressing: a lab result message with two OBX rows,
+        // reading the value (OBX-5) of the SECOND OBX (`OBX[2]`). Repetitions in a
+        // location are 1-based, so `OBX[2]` is the second occurrence.
+        String getObx = "SELECT hl7.main.hl7_get(" + Examples.ORU_MSG_SQL + ", 'OBX[2]-5');";
         return FunctionMetadata.describe(description())
                 .withCategories("hl7", "healthcare", "extraction")
                 .withTag("vgi.category", "extraction")
@@ -46,13 +50,16 @@ public final class GetFunction extends ScalarFn {
                                 + "and a segment repetition such as `'DG1[2]-3'` or `'DG1(2)-3'`. "
                                 + "Field, component, and subcomponent indices are 1-based per HL7 "
                                 + "convention; the first repetition of a repeating field is "
-                                + "addressed.\n\n"
+                                + "addressed. A segment repetition in brackets is also 1-based, so "
+                                + "`'OBX[2]-5'` reads the second OBX — this is the 1-based counterpart "
+                                + "of the 0-based `segment_rep` column emitted by `hl7_fields` "
+                                + "(`segment_rep = 1` there is `[2]` here).\n\n"
                                 + "Use it to pull individual data points (patient name, message "
                                 + "type, ordering provider, etc.) out of a feed without exploding "
                                 + "the whole message. Returns NULL when the message is malformed, "
                                 + "the location syntax is invalid, or the addressed element is "
                                 + "absent; a NULL message yields NULL. The `message` argument is a "
-                                + "VARCHAR text or a BLOB of bytes.",
+                                + "`VARCHAR` text or a `BLOB` of bytes.",
                         "## hl7_get\n\n"
                                 + "Reads one value from an HL7 v2.x message by location — e.g. "
                                 + "`hl7_get(msg, 'PID-5.1')` for a patient's family name.\n\n"
@@ -66,10 +73,15 @@ public final class GetFunction extends ScalarFn {
                         new FunctionExample(getPid,
                                 "Extract the patient's family name (component 1 of PID-5).", "Doe"),
                         new FunctionExample(getMsh,
-                                "Extract the message type field (MSH-9) by location.", "ADT^A01")))
+                                "Extract the message type field (MSH-9) by location.", "ADT^A01"),
+                        new FunctionExample(getObx,
+                                "Address a repeated segment: read the value (OBX-5) of the second "
+                                        + "OBX result via the 1-based repetition `OBX[2]`.", "14.1")))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(
                         getPid, "Extract the patient's family name (component 1 of PID-5).",
-                        getMsh, "Extract the message type field (MSH-9) by location."));
+                        getMsh, "Extract the message type field (MSH-9) by location.",
+                        getObx, "Address a repeated segment: read the value (OBX-5) of the second "
+                                + "OBX result via the 1-based repetition `OBX[2]`."));
     }
 
     @Override protected ArrowType outputType(Schema inputSchema, Arguments args) {
