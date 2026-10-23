@@ -1,0 +1,58 @@
+# Private grader sidecar for `vgi-lint simulate` (and `lint`'s VGI520 coverage).
+# The worker publishes only task names + prompts in `vgi.agent_test_tasks`
+# (Examples.AGENT_TEST_TASKS); these grader fields are keyed by that name and
+# never sent to the analyst agent (VGI416).
+#
+# Every prompt embeds the same canonical ADT^A01 admit message; reference_sql
+# passes it as a DuckDB E'...' literal (CR-delimited segments). Column names are
+# ignored (the analyst may alias freely); `unordered` is false where the task
+# expects message order.
+tasks:
+  - name: list_segments
+    reference_sql: |-
+      SELECT segment FROM hl7.main.hl7_segments(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') ORDER BY seq
+    success_criteria: 'One row per segment in message order: MSH, EVN, PID, PV1.'
+    ignore_column_names: true
+    unordered: true
+
+  - name: pid_fields_long
+    reference_sql: |-
+      SELECT field, value FROM hl7.main.hl7_fields(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') WHERE segment = 'PID' ORDER BY field, repetition
+    success_criteria: 'One row per PID field value, pairing each 1-based field number with its value (for example field 5 is Doe^John).'
+    ignore_column_names: true
+    unordered: true
+
+  - name: patient_family_name
+    reference_sql: |-
+      SELECT hl7.main.hl7_get(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I', 'PID-5.1') AS family_name
+    success_criteria: 'The single value Doe.'
+    ignore_column_names: true
+    unordered: false
+
+  - name: message_type_and_version
+    reference_sql: |-
+      SELECT hl7.main.hl7_message_type(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') AS type, hl7.main.hl7_version(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') AS version
+    success_criteria: 'One row with the message type ADT^A01 and the version 2.5.'
+    ignore_column_names: true
+    unordered: false
+
+  - name: message_control_id
+    reference_sql: |-
+      SELECT hl7.main.hl7_message_control_id(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') AS control_id
+    success_criteria: 'The single value MSG00001.'
+    ignore_column_names: true
+    unordered: false
+
+  - name: validate_message
+    reference_sql: |-
+      SELECT hl7.main.is_valid_hl7(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') AS ok
+    success_criteria: 'The message is well-formed, so the result is true.'
+    ignore_column_names: true
+    unordered: false
+
+  - name: list_example_messages
+    reference_sql: |-
+      SELECT message_type FROM hl7.main.example_messages ORDER BY name
+    success_criteria: 'One row per built-in example message giving its message type.'
+    ignore_column_names: true
+    unordered: true
