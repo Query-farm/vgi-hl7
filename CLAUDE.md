@@ -90,7 +90,7 @@ Makefile                     build / fixtures / test-unit / test-sql / test / cl
 
 ## SDK dependency & CI (self-contained via Maven Central)
 
-Depends on `farm.query:vgi:0.43.0` (pulls in `farm.query:vgirpc:0.33.1`
+Depends on `farm.query:vgi:0.46.0` (pulls in `farm.query:vgirpc:0.33.3`
 transitively; declared explicitly since the code imports `farm.query.vgirpc.*`).
 **On Maven Central**, so the build is fully self-contained — no sibling checkout,
 no `mavenLocal`, no composite build. `.github/workflows/test.yml` runs a
@@ -113,3 +113,10 @@ make test                     # both
 Fixtures are reproducible via `make fixtures` (Gradle `generateSqlFixtures`,
 `SqlFixtureGenerator`) — the `.hl7` files are written from the same `Fixtures`
 builders the JUnit tests use.
+
+## VGI protocol / haybarn 2.0
+
+vgi 0.46.0 speaks VGI protocol **vgi.v3 / 3.1.0** (`/health` reports
+`"protocol":"vgi.v3"`); only haybarn **2.0**'s community `vgi` extension attaches
+it. CI resolves the newest `haybarn-v2.0.*` release, runs `haybarn-unittest
+--keep-home`, and gates metadata with `Query-farm/vgi-lint-check@v2`.

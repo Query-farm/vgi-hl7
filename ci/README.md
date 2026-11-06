@@ -18,8 +18,13 @@ extension from the Haybarn community channel:
    spawn as a subprocess (the VGI LOCATION), and the same JAR serves the HTTP and
    AF_UNIX transports via `--http` / `--unix`.
 2. **Download the runner** — the `haybarn_unittest-linux-amd64.zip` asset from
-   the latest Haybarn release (resolved once in the `resolve-haybarn` job so the
-   version is never hardcoded).
+   the newest **haybarn 2.0** release (`haybarn-v2.0.*`, release candidates
+   included; resolved once in the `resolve-haybarn` job so the version is never
+   hardcoded). A bare `gh release view` would return the 1.5 line, whose `vgi`
+   extension cannot attach this worker (VGI protocol vgi.v3 / 3.1). The warm step
+   uses `FORCE INSTALL` and every `haybarn-unittest` call passes `--keep-home`
+   (haybarn-unittest 2.0 otherwise isolates `$HOME`, so installed extensions are
+   "not found").
 3. **Preprocess** — the standalone runner links none of the extensions the
    tests gate on, so [`preprocess-require.awk`](preprocess-require.awk) rewrites
    each `require <ext>` into an explicit signed `INSTALL <ext> FROM

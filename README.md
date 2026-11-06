@@ -102,7 +102,7 @@ make test          # both
 make build         # fat JAR -> build/libs/vgi-hl7-<ver>-all.jar
 ```
 
-The SQL E2E runner is `haybarn-unittest` (`uv tool install haybarn-unittest`, then
+The SQL E2E runner is `haybarn-unittest` (`uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'`, then
 `export PATH="$HOME/.local/bin:$PATH"`). The committed `test/sql/data/*.hl7`
 fixtures are reproducible from source via `make fixtures`.
 
