@@ -21,7 +21,7 @@ extension from the Haybarn community channel:
    the newest **haybarn 2.0** release (`haybarn-v2.0.*`, release candidates
    included; resolved once in the `resolve-haybarn` job so the version is never
    hardcoded). A bare `gh release view` would return the 1.5 line, whose `vgi`
-   extension cannot attach this worker (VGI protocol vgi.v3 / 3.1). The warm step
+   extension cannot attach this worker (VGI protocol vgi.v3 / 3.2). The warm step
    uses `FORCE INSTALL` and every `haybarn-unittest` call passes `--keep-home`
    (haybarn-unittest 2.0 otherwise isolates `$HOME`, so installed extensions are
    "not found").
