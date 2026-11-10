@@ -32,7 +32,11 @@ public final class Main {
      */
     private static Map<String, String> catalogTags() {
         Map<String, String> tags = new LinkedHashMap<>();
-        tags.put("vgi.title", "HL7 v2.x Clinical Message Parser");
+        tags.put("vgi.title", "HL7 v2 Parser");
+        tags.put(
+                "vgi.subtitle",
+                "Split, validate, and pull fields out of HL7 v2.x clinical messages "
+                        + "such as ADT and ORU feeds.");
         tags.put(
                 "vgi.keywords",
                 Meta.keywordsJson(
@@ -104,7 +108,7 @@ public final class Main {
 
     private static Map<String, String> schemaTags() {
         Map<String, String> tags = new LinkedHashMap<>();
-        tags.put("vgi.title", "HL7 v2.x Parsing — main");
+        tags.put("vgi.title", "HL7 v2 Functions");
         tags.put(
                 "vgi.keywords",
                 Meta.keywordsJson(
