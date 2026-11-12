@@ -18,7 +18,7 @@ HAPI, keeping it MIT-licensed and dependency-light (the VGI SDK is the only
 runtime dependency).
 
 ```sql
-ATTACH 'hl7' (TYPE vgi, LOCATION 'java -jar vgi-hl7-v0.3.0.jar');
+ATTACH 'hl7' (TYPE vgi, LOCATION 'java -jar vgi-hl7-v0.4.0.jar');
 
 -- One row per segment
 SELECT * FROM hl7.hl7_segments(msg);
@@ -35,7 +35,7 @@ FROM messages;
 Every [GitHub release](https://github.com/Query-farm/vgi-hl7/releases) ships a self-contained worker jar. It needs Java 21 or newer. Download it:
 
 ```sh
-curl -LO https://github.com/Query-farm/vgi-hl7/releases/download/v0.3.0/vgi-hl7-v0.3.0.jar
+curl -LO https://github.com/Query-farm/vgi-hl7/releases/download/v0.4.0/vgi-hl7-v0.4.0.jar
 ```
 
 then attach it from DuckDB (run from the directory holding the jar, or use its absolute path):
@@ -44,7 +44,7 @@ then attach it from DuckDB (run from the directory holding the jar, or use its a
 INSTALL vgi FROM community;
 LOAD vgi;
 
-ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION 'java -jar vgi-hl7-v0.3.0.jar');
+ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION 'java -jar vgi-hl7-v0.4.0.jar');
 
 -- Split an admit message into its segments, in message order.
 SELECT seq, segment, field_count FROM hl7.main.hl7_segments(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') ORDER BY seq;
@@ -58,7 +58,7 @@ SELECT segment, field, repetition, value FROM hl7.main.hl7_fields(E'MSH|^~\\&|SE
 - **Docker** (the image bundles the worker and a Java runtime):
 
   ```sql
-  ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-hl7:0.3.0');
+  ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-hl7:0.4.0');
   ```
 
 ### Build from source
