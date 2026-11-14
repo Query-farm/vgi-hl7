@@ -32,6 +32,9 @@ FROM messages;
 
 ## Quick start
 
+For an executed SQL walkthrough with charts and a portable release connection, see
+the [HL7 notebooks](notebooks/README.md).
+
 Every [GitHub release](https://github.com/Query-farm/vgi-hl7/releases) ships a self-contained worker jar. It needs Java 21 or newer. Download it:
 
 ```sh
