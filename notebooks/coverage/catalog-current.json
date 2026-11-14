@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "repository": "Query-farm/vgi-hl7",
+  "revision": "e7b1d954bb2b49d1626f8d25cff17a4f4082c179",
+  "captured_at": "2026-11-14T20:22:08.355147+00:00",
+  "default_schema": "main",
+  "scope": "all_public_functions_and_tables",
+  "complete": true,
+  "evidence": [
+    {
+      "path": "coverage/current-functions.json",
+      "sha256": "4232d6506d21d522676fa6399952a182e4411bc4cb83131984f2b481dd20994b",
+      "description": "Complete worker-filtered functions export through actual published Haybarn"
+    },
+    {
+      "path": "coverage/current-tables.json",
+      "sha256": "43c1c3fdd7f810507d463d351f04a052edafa24b85636ad47b83f78f650a1fc6",
+      "description": "Complete worker-filtered tables export through actual published Haybarn"
+    },
+    {
+      "path": "coverage/current-views.json",
+      "sha256": "7cbf01abf1afc5d6b7a059cd67864e5f63b36cb3fb02a1bb58a1a7867d6fa59a",
+      "description": "Complete worker-filtered views export through actual published Haybarn"
+    }
+  ],
+  "objects": [
+    {
+      "schema": "main",
+      "name": "hl7_fields",
+      "kind": "function",
+      "signatures": [
+        "hl7_fields(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "hl7_get",
+      "kind": "function",
+      "signatures": [
+        "hl7_get(ANY, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "hl7_message_control_id",
+      "kind": "function",
+      "signatures": [
+        "hl7_message_control_id(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "hl7_message_type",
+      "kind": "function",
+      "signatures": [
+        "hl7_message_type(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "hl7_segments",
+      "kind": "function",
+      "signatures": [
+        "hl7_segments(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "hl7_version",
+      "kind": "function",
+      "signatures": [
+        "hl7_version(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "is_valid_hl7",
+      "kind": "function",
+      "signatures": [
+        "is_valid_hl7(ANY)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "example_messages",
+      "kind": "table",
+      "signatures": [
+        "VIEW"
+      ],
+      "authentication": "none",
+      "access": "read"
+    }
+  ]
+}

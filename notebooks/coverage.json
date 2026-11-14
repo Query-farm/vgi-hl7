@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "catalogs": {
+    "released": {
+      "path": "coverage/catalog-released.json",
+      "sha256": "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "catalog_sha256": "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+        "notes": "Complete native function/table/view exports through actual Haybarn attachments reconcile eight logical names, including the example_messages view. No exclusions. Main.java registers seven function names plus that view. Current main changes only composed metadata examples in Examples/ExampleMessages/FieldsFunction/GetFunction; parsing and scalar computations are unchanged. Current existing built JAR advertises the new ordered-message-log metadata absent from the release, matching source registration; no rebuild. Notebook execution uses the public release JAR under managed Java 21.0.8."
+      }
+    },
+    "current": {
+      "path": "coverage/catalog-current.json",
+      "sha256": "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "catalog_sha256": "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229",
+        "notes": "Complete native function/table/view exports through actual Haybarn attachments reconcile eight logical names, including the example_messages view. No exclusions. Main.java registers seven function names plus that view. Current main changes only composed metadata examples in Examples/ExampleMessages/FieldsFunction/GetFunction; parsing and scalar computations are unchanged. Current existing built JAR advertises the new ordered-message-log metadata absent from the release, matching source registration; no rebuild. Notebook execution uses the public release JAR under managed Java 21.0.8."
+      }
+    }
+  },
+  "notebooks": [
+    {
+      "path": "01_preserve_identifier_repetitions.ipynb",
+      "sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+      "execution": {
+        "path": "coverage/run-01.json",
+        "sha256": "def0f762eeb973a112a9b97e61bc068bc7af09e98d848d80b6a27027b4b4894b"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "object": {
+        "schema": "main",
+        "name": "example_messages"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "reference-query",
+          "reference": "hl7.main.example_messages"
+        }
+      ],
+      "narrative_cells": [
+        "reference-question"
+      ],
+      "result_cells": [
+        "reference-query"
+      ],
+      "interpretation_cells": [
+        "reference-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Use the shipped synthetic registry to choose the header profile for a focused repeated-identifier example.",
+        "finding": "The registry exposes ADT and ORU samples. Their actual declared type/version accessors agree with the authored profile; ADT version 2.5 establishes this walkthrough scope while ORU observation interpretation is left outside it. The seven repetition fixtures are separate invented messages."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_message_type"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "reference-query",
+          "reference": "hl7.main.hl7_message_type"
+        }
+      ],
+      "narrative_cells": [
+        "reference-question"
+      ],
+      "result_cells": [
+        "reference-query"
+      ],
+      "interpretation_cells": [
+        "metadata-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Distinguish message profiles and raw delimiter-dependent header text before applying a field interpretation.",
+        "finding": "The shipped examples declare ADT^A01 and ORU^R01. The custom message C uses ADT*A01, so raw string equality with a caret-delimited type would miss the equivalent type/event shape. The field table supplies its actual separator."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_version"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "reference-query",
+          "reference": "hl7.main.hl7_version"
+        }
+      ],
+      "narrative_cells": [
+        "reference-question"
+      ],
+      "result_cells": [
+        "reference-query"
+      ],
+      "interpretation_cells": [
+        "reference-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Make the declared version assumption visible when choosing a sample profile.",
+        "finding": "Both shipped examples declare version 2.5; the ADT type plus this declared version selects the illustrated profile. Missing version in the short header remains NULL and parser acceptance is not treated as conformance."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_message_control_id"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "e067dcef",
+          "reference": "hl7.main.hl7_message_control_id"
+        }
+      ],
+      "narrative_cells": [
+        "1500e715"
+      ],
+      "result_cells": [
+        "metadata-finding"
+      ],
+      "interpretation_cells": [
+        "metadata-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Separate message identity from the identifiers inside a repeating PID field.",
+        "finding": "Four of seven invented rows carry control IDs, while five parse. The authored message_key preserves rows whose control ID is absent; a message control ID is not counted as a patient identifier or used to drop incomplete rows."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "is_valid_hl7"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "e067dcef",
+          "reference": "hl7.main.is_valid_hl7"
+        }
+      ],
+      "narrative_cells": [
+        "1500e715"
+      ],
+      "result_cells": [
+        "84ce0630"
+      ],
+      "interpretation_cells": [
+        "01b3a7b5"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Keep rejected, missing, accepted-incomplete and usable inputs distinct in the counting population.",
+        "finding": "The header-only message parses without inventing PID-3 or a control ID. An empty PID-3 is a known zero, whereas missing/rejected/NULL messages keep NULL counts and stay outside the count chart with explicit diagnostics."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_segments"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "bf8083b2",
+          "reference": "hl7.main.hl7_segments"
+        }
+      ],
+      "narrative_cells": [
+        "97e0f4e9"
+      ],
+      "result_cells": [
+        "bf8083b2"
+      ],
+      "interpretation_cells": [
+        "segments-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Inspect source segment order and custom-delimiter text before expanding fields.",
+        "finding": "Message C produces MSH then PID rows; the segment representation retains the raw custom-delimiter message and its order, while the field representation establishes the finer repetition grain."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_get"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "bf8083b2",
+          "reference": "hl7.main.hl7_get"
+        }
+      ],
+      "narrative_cells": [
+        "97e0f4e9"
+      ],
+      "result_cells": [
+        "encoding-accessor-comparison"
+      ],
+      "interpretation_cells": [
+        "accessor-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Compare first-repetition access with full field expansion and expose the release limitation on MSH-2.",
+        "finding": "The scalar PID-3 accessor equals repetition zero. For A it retains HOSP and omits later LAB/RESEARCH occurrences. The MSH-2 scalar truncates to a prefix, so complete encoding characters come from hl7_fields. Different locations are materialized separately to avoid the documented engine expression-merging issue."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "hl7_fields"
+      },
+      "notebook": "01_preserve_identifier_repetitions.ipynb",
+      "sql": [
+        {
+          "cell": "f87422b1",
+          "reference": "hl7.main.hl7_fields"
+        }
+      ],
+      "narrative_cells": [
+        "0fe00ced"
+      ],
+      "result_cells": [
+        "288876f2"
+      ],
+      "interpretation_cells": [
+        "fa8a5573"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T20:32:58.854556+00:00",
+        "notebook_sha256": "8345f6db756cb768cfef48abf9a85f87588c74e3deab48178ff912d6b1b1307e",
+        "catalog_sha256": [
+          "4cf5468e33c41b9e3c89a3e3843555514bb14550933f6a260159ea25e985e841",
+          "1fba4042736aa6bc38be88b1a1e5fdb4ce5ee64987ac1e6bf4c91d854e0e1229"
+        ],
+        "purpose": "Preserve identifier repetitions and declared component separators while evaluating a first-only selection policy.",
+        "finding": "Expanded PID-3 rows retain message, segment and field repetition indices plus raw text. Selecting only repetition zero changes six occurrences to three and removes two namespaces; bare strings and namespace-qualified sample keys remain distinct measures, neither counting people."
+      }
+    }
+  ]
+}

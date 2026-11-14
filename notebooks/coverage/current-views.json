@@ -1,0 +1,44 @@
+{
+  "query": "SELECT * FROM duckdb_views() WHERE database_name='hl7' ORDER BY schema_name,view_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "schema_oid",
+    "view_name",
+    "view_oid",
+    "comment",
+    "tags",
+    "internal",
+    "temporary",
+    "column_count",
+    "sql",
+    "is_bound"
+  ],
+  "rows": [
+    [
+      "hl7",
+      22592,
+      "main",
+      22794,
+      "example_messages",
+      22795,
+      "Curated, browsable registry of ready-to-use sample HL7 v2 messages.",
+      {
+        "domain": "healthcare",
+        "topic": "hl7-v2-clinical-messaging",
+        "vgi.category": "reference",
+        "vgi.doc_llm": "A curated, browsable registry of ready-to-use example HL7 v2 messages, one per row. Query it first to discover what message types this worker handles and to obtain a well-formed sample you can study or copy. Columns: `name` (a short slug id), `message_type` (the HL7 message type such as `ADT^A01` or `ORU^R01`), `trigger_event` (the HL7 trigger-event code such as `A01`), `segment_count` (how many segments the sample has), `description` (a one-line summary), and `message` (the raw, carriage-return-delimited HL7 text). The view takes no arguments and needs no credentials. Note: VGI table functions accept only literal arguments, so paste the `message` text inline into `hl7_segments`, `hl7_fields`, or `hl7_get` rather than passing this column as a subquery.",
+        "vgi.doc_md": "## example_messages\n\nA small, built-in catalog of sample **HL7 v2** messages you can query without supplying any input. It exists so you can see a well-formed message and the message types this worker understands before calling the parsing functions, which all require a message argument.\n\nEach row describes one sample: a slug `name`, the HL7 `message_type` (e.g. `ADT^A01`, `ORU^R01`), the `trigger_event` code, a precomputed `segment_count`, a short `description`, and the raw CR-delimited `message` text itself. Browse it, sort by `segment_count`, or copy a `message` literal into `hl7_segments`, `hl7_fields`, or `hl7_get` to experiment.\n\nThe view is defined over an inline `VALUES` list, so it scans instantly with no network access and no credentials.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT name, message_type, trigger_event, segment_count FROM hl7.main.example_messages ORDER BY segment_count DESC, name;\",\"description\":\"List the built-in sample messages, richest first, showing their type, trigger event, and segment count.\"},{\"sql\":\"SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, hl7.main.hl7_message_control_id(message) AS control_id, hl7.main.hl7_message_type(message) AS message_type, hl7.main.hl7_version(message) AS version FROM hl7.main.example_messages WHERE hl7.main.is_valid_hl7(message) ORDER BY sent_at, control_id\",\"description\":\"Turn a table of raw messages into an ordered message log: skip malformed rows with is_valid_hl7, read the send time (MSH-7) with hl7_get as a TIMESTAMP, and add the control id, message type, and version from the MSH accessors (here: MSG00001 ADT^A01 at 12:00, then MSG00002 ORU^R01 at 12:30).\"}]",
+        "vgi.keywords": "[\"example\",\"examples\",\"sample\",\"samples\",\"registry\",\"catalog\",\"hl7\",\"hl7 v2\",\"ADT\",\"ORU\",\"message type\",\"trigger event\",\"browse\",\"demo\"]",
+        "vgi.title": "Example HL7 v2 Messages"
+      },
+      false,
+      false,
+      null,
+      "CREATE VIEW example_messages AS SELECT * FROM (SELECT * FROM (VALUES ('adt_a01', 'ADT^A01', 'A01', 4, 'Patient admission: a new inpatient admit carrying EVN, PID, and PV1 segments. The classic ADT (Admit/Discharge/Transfer) event.', 'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I'), ('oru_r01', 'ORU^R01', 'R01', 5, 'Unsolicited observation result: a laboratory report with an OBR order and two OBX result rows (a complete blood count).', 'MSH|^~\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rOBR|1||ORD123|CBC^Complete Blood Count\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N')) AS valueslist) AS t(\"name\", message_type, trigger_event, segment_count, description, message);",
+      false
+    ]
+  ]
+}

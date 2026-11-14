@@ -1,0 +1,315 @@
+{
+  "query": "SELECT * FROM duckdb_functions() WHERE database_name='hl7' ORDER BY schema_name,function_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "function_name",
+    "alias_of",
+    "function_type",
+    "description",
+    "comment",
+    "tags",
+    "return_type",
+    "parameters",
+    "parameter_types",
+    "varargs",
+    "macro_definition",
+    "has_side_effects",
+    "internal",
+    "extension_name",
+    "function_oid",
+    "examples",
+    "stability",
+    "categories"
+  ],
+  "rows": [
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_fields",
+      null,
+      "table",
+      "Explode an HL7 v2.x message into long format: one row per field value (repetitions expanded), keyed by segment, segment occurrence, field, and repetition. Component structure is preserved in the raw value text.",
+      null,
+      {
+        "vgi.category": "parsing",
+        "vgi.doc_llm": "Explodes an HL7 v2.x message into long (tidy) format: one row per field value, with repeating fields expanded into separate rows. Each row is keyed by `segment` (3-letter id), `segment_rep` (0-based occurrence of that segment within the message, to disambiguate repeated OBX/DG1/etc.), `field` (1-based HL7 field number), and `repetition` (0-based index of the repeated value); `value` holds the raw field text with its component/subcomponent structure preserved.\n\nUse it to unpivot an entire message for set-based SQL (filtering, grouping, joining) instead of addressing one location at a time with `hl7_get`. Note the MSH quirk: MSH-1 (the field separator) and MSH-2 (the encoding characters, which literally contain `~`) are emitted as single verbatim values and are not re-split on the repetition separator. The `message` argument is a `VARCHAR` text or `BLOB` bytes; NULL or malformed input yields no rows.",
+        "vgi.doc_md": "## hl7_fields\n\nUnpivots a whole HL7 v2.x message into long format \u2014 one row per field value with repetitions expanded \u2014 so you can query it with ordinary SQL.\n\nComponent/subcomponent structure stays intact in `value`; decompose it further with `hl7_get` or by splitting on the encoding characters. MSH-1/MSH-2 are kept verbatim. The returned columns are listed in this function's result schema.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT field, value FROM hl7.main.hl7_fields(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I') WHERE segment = 'PID';\",\"description\":\"List every field of the PID (patient identification) segment as long-format rows.\"},{\"sql\":\"SELECT hl7.main.hl7_get(E'MSH|^~\\\\\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rOBR|1||ORD123|CBC^Complete Blood Count\\\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'PID-3.1') AS mrn, f.segment_rep + 1 AS obx_set_id, split_part(max(f.value) FILTER (WHERE f.field = 3), '^', 2) AS test, TRY_CAST(max(f.value) FILTER (WHERE f.field = 5) AS DOUBLE) AS result, max(f.value) FILTER (WHERE f.field = 6) AS units, max(f.value) FILTER (WHERE f.field = 7) AS reference_range, max(f.value) FILTER (WHERE f.field = 8) AS abnormal_flag FROM hl7.main.hl7_fields(E'MSH|^~\\\\\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rOBR|1||ORD123|CBC^Complete Blood Count\\\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N') AS f WHERE f.segment = 'OBX' GROUP BY f.segment_rep ORDER BY obx_set_id\",\"description\":\"Flatten an ORU^R01 lab report into one row per OBX result (test name, numeric value, units, reference range, abnormal flag) by pivoting hl7_fields on segment_rep, stamped with the patient MRN from hl7_get('PID-3.1') (two rows: White Blood Cell Count 7.2 and Hemoglobin 14.1 for MRN 10001).\"}]",
+        "vgi.keywords": "[\"hl7 fields\",\"long format\",\"tidy\",\"unpivot\",\"explode\",\"repetitions\",\"field value\",\"segment_rep\",\"component\",\"subcomponent\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.result_columns_schema": "[{\"name\":\"segment\",\"type\":\"VARCHAR\",\"description\":\"3-letter segment identifier (e.g. MSH, PID).\"},{\"name\":\"segment_rep\",\"type\":\"INTEGER\",\"description\":\"0-based occurrence index of this segment within the message.\"},{\"name\":\"field\",\"type\":\"INTEGER\",\"description\":\"1-based HL7 field number within the segment.\"},{\"name\":\"repetition\",\"type\":\"INTEGER\",\"description\":\"0-based repetition index of the field value.\"},{\"name\":\"value\",\"type\":\"VARCHAR\",\"description\":\"Raw field-value text (component/subcomponent structure preserved).\"}]",
+        "vgi.title": "Explode HL7 Message Into Field Rows"
+      },
+      null,
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22601,
+      [
+        "SELECT field, value FROM hl7.main.hl7_fields(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') WHERE segment = 'PID';",
+        "SELECT hl7.main.hl7_get(E'MSH|^~\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rOBR|1||ORD123|CBC^Complete Blood Count\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'PID-3.1') AS mrn, f.segment_rep + 1 AS obx_set_id, split_part(max(f.value) FILTER (WHERE f.field = 3), '^', 2) AS test, TRY_CAST(max(f.value) FILTER (WHERE f.field = 5) AS DOUBLE) AS result, max(f.value) FILTER (WHERE f.field = 6) AS units, max(f.value) FILTER (WHERE f.field = 7) AS reference_range, max(f.value) FILTER (WHERE f.field = 8) AS abnormal_flag FROM hl7.main.hl7_fields(E'MSH|^~\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rOBR|1||ORD123|CBC^Complete Blood Count\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N') AS f WHERE f.segment = 'OBX' GROUP BY f.segment_rep ORDER BY obx_set_id"
+      ],
+      null,
+      [
+        "hl7",
+        "healthcare",
+        "parsing"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_get",
+      null,
+      "scalar",
+      "Extract a value from an HL7 v2.x message by location (e.g. 'PID-5', 'PID-5.1', 'MSH-9.1', 'DG1[2]-3'); 1-based field/component/subcomponent indices.",
+      null,
+      {
+        "vgi.category": "extraction",
+        "vgi.doc_llm": "Extracts a single value from an HL7 v2.x message addressed by an HL7 location string. Supports `'PID-5'` (a whole field), `'PID-5.1'` (component 1 of field 5), `'MSH-9.1.2'` (component.subcomponent), and a segment repetition such as `'DG1[2]-3'` or `'DG1(2)-3'`. Field, component, and subcomponent indices are 1-based per HL7 convention; the first repetition of a repeating field is addressed. A segment repetition in brackets is also 1-based, so `'OBX[2]-5'` reads the second OBX \u2014 this is the 1-based counterpart of the 0-based `segment_rep` column emitted by `hl7_fields` (`segment_rep = 1` there is `[2]` here).\n\nUse it to pull individual data points (patient name, message type, ordering provider, etc.) out of a feed without exploding the whole message. Returns NULL when the message is malformed, the location syntax is invalid, or the addressed element is absent; a NULL message yields NULL. The `message` argument is a `VARCHAR` text or a `BLOB` of bytes.",
+        "vgi.doc_md": "## hl7_get\n\nReads one value from an HL7 v2.x message by location \u2014 e.g. `hl7_get(msg, 'PID-5.1')` for a patient's family name.\n\nLocation grammar: `SEG-field[.component[.subcomponent]]` with an optional segment repetition `SEG[n]-field`. Indices are 1-based. Missing/invalid locations return NULL rather than erroring, so it is safe to run across dirty data.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT hl7.main.hl7_get(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I', 'PID-5.1');\",\"description\":\"Extract the patient's family name (component 1 of PID-5).\"},{\"sql\":\"SELECT hl7.main.hl7_get(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I', 'MSH-9');\",\"description\":\"Extract the message type field (MSH-9) by location.\"},{\"sql\":\"SELECT hl7.main.hl7_get(E'MSH|^~\\\\\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rOBR|1||ORD123|CBC^Complete Blood Count\\\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'OBX[2]-5');\",\"description\":\"Address a repeated segment: read the value (OBX-5) of the second OBX result via the 1-based repetition `OBX[2]`.\"},{\"sql\":\"SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, hl7.main.hl7_message_control_id(message) AS control_id, hl7.main.hl7_message_type(message) AS message_type, hl7.main.hl7_version(message) AS version FROM hl7.main.example_messages WHERE hl7.main.is_valid_hl7(message) ORDER BY sent_at, control_id\",\"description\":\"Turn a table of raw messages into an ordered message log: skip malformed rows with is_valid_hl7, read the send time (MSH-7) with hl7_get as a TIMESTAMP, and add the control id, message type, and version from the MSH accessors (here: MSG00001 ADT^A01 at 12:00, then MSG00002 ORU^R01 at 12:30).\"}]",
+        "vgi.keywords": "[\"hl7 get\",\"extract\",\"location\",\"PID-5\",\"MSH-9\",\"component\",\"subcomponent\",\"accessor\",\"field path\",\"pluck value\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.title": "Extract HL7 Value By Location"
+      },
+      "VARCHAR",
+      [
+        "message",
+        "location"
+      ],
+      [
+        "ANY",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22596,
+      [
+        "SELECT hl7.main.hl7_get(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I', 'PID-5.1');",
+        "SELECT hl7.main.hl7_get(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I', 'MSH-9');",
+        "SELECT hl7.main.hl7_get(E'MSH|^~\\\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rOBR|1||ORD123|CBC^Complete Blood Count\\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'OBX[2]-5');",
+        "SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, hl7.main.hl7_message_control_id(message) AS control_id, hl7.main.hl7_message_type(message) AS message_type, hl7.main.hl7_version(message) AS version FROM hl7.main.example_messages WHERE hl7.main.is_valid_hl7(message) ORDER BY sent_at, control_id"
+      ],
+      "CONSISTENT",
+      [
+        "hl7",
+        "healthcare",
+        "extraction"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_message_control_id",
+      null,
+      "scalar",
+      "The message control ID from MSH-10.",
+      null,
+      {
+        "vgi.category": "extraction",
+        "vgi.doc_llm": "Reads the message control ID from field MSH-10, the sender-assigned unique identifier for this message. It is echoed back in the acknowledgement (ACK MSA-2) and is the key for de-duplication and message tracking.\n\nUse it to correlate a message with its ACK, to dedupe a feed, or to trace a single message end to end. Returns the raw MSH-10 text, or NULL when the message is malformed or the field is absent; NULL input yields NULL. The `message` argument is a `VARCHAR` text or `BLOB` bytes.",
+        "vgi.doc_md": "## hl7_message_control_id\n\nReturns MSH-10, the message control id \u2014 the sender's unique id for the message, echoed in the ACK (MSA-2).\n\nUse it for de-duplication, ACK correlation, and message tracing. Malformed or absent input maps to NULL rather than erroring.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT hl7.main.hl7_message_control_id(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I');\",\"description\":\"Read the message control ID (MSH-10) used for acknowledgements.\"}]",
+        "vgi.keywords": "[\"hl7 control id\",\"MSH-10\",\"message control id\",\"ACK\",\"MSA-2\",\"dedupe\",\"deduplication\",\"tracking\",\"correlation\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.title": "Read HL7 Message Control Id"
+      },
+      "VARCHAR",
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22597,
+      [
+        "SELECT hl7.main.hl7_message_control_id(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I');"
+      ],
+      "CONSISTENT",
+      [
+        "hl7",
+        "healthcare"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_message_type",
+      null,
+      "scalar",
+      "The HL7 message type from MSH-9 (e.g. 'ADT^A01' or 'ADT^A01^ADT_A01').",
+      null,
+      {
+        "vgi.category": "extraction",
+        "vgi.doc_llm": "Reads the HL7 message type from field MSH-9, e.g. `ADT^A01` (event) or `ADT^A01^ADT_A01` (with the message structure). This identifies what kind of message it is \u2014 an admit (ADT), observation result (ORU), order (ORM), etc.\n\nUse it to route or filter a mixed feed by message type. Returns the raw MSH-9 text, or NULL when the message is malformed or the field is absent; NULL input yields NULL. The `message` argument is a `VARCHAR` text or `BLOB` bytes.",
+        "vgi.doc_md": "## hl7_message_type\n\nReturns MSH-9, the HL7 message type/trigger event (e.g. `ADT^A01`).\n\nThe most common dispatch key in an HL7 v2 feed \u2014 use it to split or route messages by type. Malformed/absent input maps to NULL rather than erroring.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT hl7.main.hl7_message_type(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I');\",\"description\":\"Read the message type (MSH-9) from an admit message.\"}]",
+        "vgi.keywords": "[\"hl7 message type\",\"MSH-9\",\"trigger event\",\"ADT\",\"ORU\",\"ORM\",\"message kind\",\"routing\",\"dispatch\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.title": "Read HL7 Message Type"
+      },
+      "VARCHAR",
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22598,
+      [
+        "SELECT hl7.main.hl7_message_type(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I');"
+      ],
+      "CONSISTENT",
+      [
+        "hl7",
+        "healthcare"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_segments",
+      null,
+      "table",
+      "Split an HL7 v2.x message into its segments: one row per segment with its 3-letter id, field count, and raw text.",
+      null,
+      {
+        "vgi.category": "parsing",
+        "vgi.doc_llm": "Splits an HL7 v2.x message into its constituent segments, returning one row per segment in message order. Each row carries the 1-based ordinal (`seq`), the 3-letter segment id (`segment`, e.g. `MSH`, `PID`, `PV1`), the number of fields in the segment (`field_count`, using HL7 numbering so `MSH-1` counts), and the raw segment text (`raw`).\n\nUse it as the first step when ingesting a feed: enumerate what segments a message contains before drilling into fields with `hl7_fields` or `hl7_get`. The `message` argument is polymorphic \u2014 a `VARCHAR` carrying the message text or a `BLOB` carrying its bytes. NULL or malformed input (no leading MSH) yields no rows; the worker never throws.",
+        "vgi.doc_md": "## hl7_segments\n\nReturns one row per segment of an HL7 v2.x message, in order. Handy for discovering a message's structure before extracting fields.\n\nPass the message inline as a `VARCHAR`/`BLOB`. Malformed or NULL input simply produces no rows. The returned columns are listed in this function's result schema.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT seq, segment, field_count FROM hl7.main.hl7_segments(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I');\",\"description\":\"List every segment of an admit message in order (MSH, EVN, PID, PV1) with its field count.\"}]",
+        "vgi.executable_examples": "[\n  {\n    \"description\": \"Split an admit message into its segments in order.\",\n    \"sql\": \"SELECT seq, segment, field_count FROM hl7.main.hl7_segments(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') ORDER BY seq\"\n  },\n  {\n    \"description\": \"Explode the PID segment into long-format field rows.\",\n    \"sql\": \"SELECT field, repetition, value FROM hl7.main.hl7_fields(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') WHERE segment = 'PID' ORDER BY field\"\n  },\n  {\n    \"description\": \"Extract the patient family name (component 1 of PID-5).\",\n    \"sql\": \"SELECT hl7.main.hl7_get(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I', 'PID-5.1') AS family_name\"\n  },\n  {\n    \"description\": \"Read the message type, version, and control id from MSH.\",\n    \"sql\": \"SELECT hl7.main.hl7_message_type(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') AS type, hl7.main.hl7_version(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') AS version, hl7.main.hl7_message_control_id(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') AS control_id\"\n  },\n  {\n    \"description\": \"Validate that a well-formed message parses.\",\n    \"sql\": \"SELECT hl7.main.is_valid_hl7(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I') AS ok\"\n  },\n  {\n    \"description\": \"Turn a table of raw messages into an ordered message log: skip malformed rows with is_valid_hl7, read the send time (MSH-7) with hl7_get as a TIMESTAMP, and add the control id, message type, and version from the MSH accessors (here: MSG00001 ADT^A01 at 12:00, then MSG00002 ORU^R01 at 12:30).\",\n    \"sql\": \"SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, hl7.main.hl7_message_control_id(message) AS control_id, hl7.main.hl7_message_type(message) AS message_type, hl7.main.hl7_version(message) AS version FROM hl7.main.example_messages WHERE hl7.main.is_valid_hl7(message) ORDER BY sent_at, control_id\"\n  }\n]",
+        "vgi.keywords": "[\"hl7 segments\",\"split message\",\"segment list\",\"MSH\",\"PID\",\"PV1\",\"parse hl7\",\"segment id\",\"message structure\",\"hl7 v2\"]",
+        "vgi.result_columns_schema": "[{\"name\":\"seq\",\"type\":\"INTEGER\",\"description\":\"1-based ordinal of the segment within the message.\"},{\"name\":\"segment\",\"type\":\"VARCHAR\",\"description\":\"3-letter segment identifier (e.g. MSH, PID, PV1).\"},{\"name\":\"field_count\",\"type\":\"INTEGER\",\"description\":\"Number of fields in the segment (HL7 numbering; MSH-1 counts).\"},{\"name\":\"raw\",\"type\":\"VARCHAR\",\"description\":\"Raw text of the entire segment.\"}]",
+        "vgi.title": "Split HL7 Message Into Segments"
+      },
+      null,
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22602,
+      [
+        "SELECT seq, segment, field_count FROM hl7.main.hl7_segments(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I');"
+      ],
+      null,
+      [
+        "hl7",
+        "healthcare",
+        "parsing"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "hl7_version",
+      null,
+      "scalar",
+      "The HL7 version ID from MSH-12 (e.g. '2.5').",
+      null,
+      {
+        "vgi.category": "extraction",
+        "vgi.doc_llm": "Reads the HL7 version ID from field MSH-12, e.g. `2.3`, `2.5`, or `2.7`. This tells you which release of the HL7 v2.x standard the message claims to conform to, which affects field semantics across versions.\n\nUse it to branch parsing logic or to audit which versions a feed is sending. Returns the raw MSH-12 text, or NULL when the message is malformed or the field is absent; NULL input yields NULL. The `message` argument is a `VARCHAR` text or `BLOB` bytes.",
+        "vgi.doc_md": "## hl7_version\n\nReturns MSH-12, the HL7 v2.x version id (e.g. `2.5`).\n\nUseful for version-aware handling and feed audits. Malformed or absent input maps to NULL rather than erroring.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT hl7.main.hl7_version(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I');\",\"description\":\"Read the HL7 version (MSH-12) from a message.\"}]",
+        "vgi.keywords": "[\"hl7 version\",\"MSH-12\",\"version id\",\"2.3\",\"2.5\",\"2.7\",\"standard release\",\"conformance\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.title": "Read HL7 Version Id"
+      },
+      "VARCHAR",
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT hl7.main.hl7_version(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I');"
+      ],
+      "CONSISTENT",
+      [
+        "hl7",
+        "healthcare"
+      ]
+    ],
+    [
+      "hl7",
+      "22592",
+      "main",
+      "is_valid_hl7",
+      null,
+      "scalar",
+      "True when the input parses as a well-formed HL7 v2.x message (begins with an MSH segment defining the field separator and encoding characters).",
+      null,
+      {
+        "vgi.category": "validation",
+        "vgi.doc_llm": "Tests whether text parses as a well-formed HL7 v2.x message: it must begin with an `MSH` segment that defines the field separator (MSH-1) and the encoding characters (MSH-2). Returns true for a valid message, false for malformed text (never an error), and NULL for a NULL input.\n\nUse it as a cheap gate before parsing \u2014 e.g. filter a staging table to rows that are actually HL7 v2 before calling `hl7_segments`, `hl7_fields`, or `hl7_get`. The `message` argument is a `VARCHAR` text or a `BLOB` of bytes.",
+        "vgi.doc_md": "## is_valid_hl7\n\nBoolean predicate: does this text look like an HL7 v2.x message (leading MSH with separators and encoding chars)?\n\nDesigned to be safe on dirty input \u2014 malformed text returns `false` rather than raising, and NULL maps to NULL. Pair it with a `WHERE` clause to skip non-HL7 rows before parsing.",
+        "vgi.example_queries": "[{\"sql\":\"SELECT hl7.main.is_valid_hl7(E'MSH|^~\\\\\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\\\rEVN|A01|20240101120000\\\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\\\rPV1|1|I');\",\"description\":\"Check that a well-formed ADT^A01 message validates.\"},{\"sql\":\"SELECT hl7.main.is_valid_hl7('not an hl7 message');\",\"description\":\"Malformed text validates as false (never errors).\"}]",
+        "vgi.keywords": "[\"is valid hl7\",\"validate\",\"well-formed\",\"MSH\",\"sniff\",\"gate\",\"predicate\",\"verify message\",\"parse hl7\",\"hl7 v2\"]",
+        "vgi.title": "Validate HL7 v2 Message"
+      },
+      "BOOLEAN",
+      [
+        "message"
+      ],
+      [
+        "ANY"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22600,
+      [
+        "SELECT hl7.main.is_valid_hl7(E'MSH|^~\\\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\\rEVN|A01|20240101120000\\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\\rPV1|1|I');",
+        "SELECT hl7.main.is_valid_hl7('not an hl7 message');"
+      ],
+      "CONSISTENT",
+      [
+        "hl7",
+        "healthcare",
+        "validation"
+      ]
+    ]
+  ]
+}
