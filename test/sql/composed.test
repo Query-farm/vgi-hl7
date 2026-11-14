@@ -1,0 +1,34 @@
+# name: test/sql/composed.test
+# group: [vgi_hl7]
+#
+# Composed examples (Examples.FEED_LOG_SQL / LAB_RESULTS_SQL and the
+# example_message_span_minutes agent-task grader): the scalars over the
+# example_messages view, and hl7_fields pivoted alongside hl7_get.
+
+require-env VGI_HL7_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'hl7' AS hl7 (TYPE vgi, LOCATION '${VGI_HL7_WORKER}');
+
+# Message log over the built-in samples (also the README quick-start example).
+query TTTT
+SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, hl7.main.hl7_message_control_id(message) AS control_id, hl7.main.hl7_message_type(message) AS message_type, hl7.main.hl7_version(message) AS version FROM hl7.main.example_messages WHERE hl7.main.is_valid_hl7(message) ORDER BY sent_at, control_id;
+----
+2024-01-01 12:00:00	MSG00001	ADT^A01	2.5
+2024-01-01 12:30:00	MSG00002	ORU^R01	2.5
+
+# ORU^R01 lab report flattened to one row per OBX, stamped with the MRN.
+query TIRTTTT
+SELECT hl7.main.hl7_get(E'MSH|^~\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rOBR|1||ORD123|CBC^Complete Blood Count\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N', 'PID-3.1') AS mrn, f.segment_rep + 1 AS obx_set_id, split_part(max(f.value) FILTER (WHERE f.field = 3), '^', 2) AS test, TRY_CAST(max(f.value) FILTER (WHERE f.field = 5) AS DOUBLE) AS result, max(f.value) FILTER (WHERE f.field = 6) AS units, max(f.value) FILTER (WHERE f.field = 7) AS reference_range, max(f.value) FILTER (WHERE f.field = 8) AS abnormal_flag FROM hl7.main.hl7_fields(E'MSH|^~\\&|LAB|HOSP|EHR|HOSP|20240101123000||ORU^R01|MSG00002|P|2.5\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rOBR|1||ORD123|CBC^Complete Blood Count\rOBX|1|NM|WBC^White Blood Cell Count||7.2|10*3/uL|4.0-11.0|N\rOBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N') AS f WHERE f.segment = 'OBX' GROUP BY f.segment_rep ORDER BY obx_set_id;
+----
+10001	1	White Blood Cell Count	7.2	10*3/uL	4.0-11.0	N
+10001	2	Hemoglobin	14.1	g/dL	13.5-17.5	N
+
+# example_message_span_minutes grader.
+query I
+SELECT date_diff('minute', min(strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S')), max(strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S'))) AS minutes FROM hl7.main.example_messages;
+----
+30

@@ -50,6 +50,13 @@ tasks:
     ignore_column_names: true
     unordered: false
 
+  - name: example_message_span_minutes
+    reference_sql: |-
+      SELECT date_diff('minute', min(strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S')), max(strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S'))) AS minutes FROM hl7.main.example_messages
+    success_criteria: 'A single integer: 30 minutes between the ADT^A01 (12:00:00) and ORU^R01 (12:30:00) samples.'
+    ignore_column_names: true
+    unordered: false
+
   - name: list_example_messages
     reference_sql: |-
       SELECT message_type FROM hl7.main.example_messages ORDER BY name

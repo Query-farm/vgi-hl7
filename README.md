@@ -51,6 +51,16 @@ SELECT seq, segment, field_count FROM hl7.main.hl7_segments(E'MSH|^~\\&|SENDING_
 
 -- Explode the PID segment into long-format field rows.
 SELECT segment, field, repetition, value FROM hl7.main.hl7_fields(E'MSH|^~\\&|SENDING_APP|SENDING_FAC|RECV_APP|RECV_FAC|20240101120000||ADT^A01|MSG00001|P|2.5\rEVN|A01|20240101120000\rPID|1||10001^^^HOSP^MR||Doe^John||19800101|M\rPV1|1|I') WHERE segment = 'PID' ORDER BY field, repetition;
+
+-- Combine them over a table of raw messages (here the built-in samples):
+-- gate on validity, then build an ordered message log from MSH.
+SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at,
+       hl7.main.hl7_message_control_id(message) AS control_id,
+       hl7.main.hl7_message_type(message) AS message_type,
+       hl7.main.hl7_version(message) AS version
+FROM hl7.main.example_messages
+WHERE hl7.main.is_valid_hl7(message)
+ORDER BY sent_at, control_id;
 ```
 
 ### Other ways to run it

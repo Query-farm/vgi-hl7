@@ -87,6 +87,14 @@ Makefile                     build / fixtures / test-unit / test-sql / test / cl
    `LOAD vgi;`.
 7. **NULL → NULL / no rows; malformed → false / no rows, never a crash.** Every
    function guards on `MessageInput` returning null and on parser validity.
+8. **Two `hl7_get` calls with different locations in one SELECT list collapse
+   to the first (extension bug, not ours).** `SELECT hl7_get(m,'PID-3.1'),
+   hl7_get(m,'MSH-7')` returns the PID-3.1 value twice: the community `vgi`
+   extension's `VgiScalarFunctionBindData::Equals` ignores the erased constant
+   args (`const_values`), so DuckDB's common-subexpression elimination merges the
+   calls. Seen on haybarn 2.0.0rc11 (vgi `v2.0` branch). Until the extension
+   compares `const_values`, published examples use at most one `hl7_get`
+   location per query (or put each in its own subquery and join).
 
 ## SDK dependency & CI (self-contained via Maven Central)
 

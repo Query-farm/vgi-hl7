@@ -95,7 +95,9 @@ final class ExampleMessages {
                         "SELECT name, message_type, trigger_event, segment_count "
                                 + "FROM hl7.main.example_messages ORDER BY segment_count DESC, name;",
                         "List the built-in sample messages, richest first, showing their type, "
-                                + "trigger event, and segment count."));
+                                + "trigger event, and segment count.",
+                        Examples.FEED_LOG_SQL,
+                        Examples.FEED_LOG_DESC));
 
         Map<String, String> columnComments = new LinkedHashMap<>();
         columnComments.put("name", "Short slug identifier for the sample (e.g. `adt_a01`).");

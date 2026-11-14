@@ -76,12 +76,14 @@ public final class GetFunction extends ScalarFn {
                                 "Extract the message type field (MSH-9) by location.", "ADT^A01"),
                         new FunctionExample(getObx,
                                 "Address a repeated segment: read the value (OBX-5) of the second "
-                                        + "OBX result via the 1-based repetition `OBX[2]`.", "14.1")))
+                                        + "OBX result via the 1-based repetition `OBX[2]`.", "14.1"),
+                        new FunctionExample(Examples.FEED_LOG_SQL, Examples.FEED_LOG_DESC, null)))
                 .withTag("vgi.example_queries", Examples.exampleQueriesTag(
                         getPid, "Extract the patient's family name (component 1 of PID-5).",
                         getMsh, "Extract the message type field (MSH-9) by location.",
                         getObx, "Address a repeated segment: read the value (OBX-5) of the second "
-                                + "OBX result via the 1-based repetition `OBX[2]`."));
+                                + "OBX result via the 1-based repetition `OBX[2]`.",
+                        Examples.FEED_LOG_SQL, Examples.FEED_LOG_DESC));
     }
 
     @Override protected ArrowType outputType(Schema inputSchema, Arguments args) {

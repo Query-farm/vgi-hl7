@@ -74,8 +74,12 @@ public final class FieldsFunction implements TableFunction {
                         "hl7 fields, long format, tidy, unpivot, explode, repetitions, field value, "
                                 + "segment_rep, component, subcomponent, parse hl7, hl7 v2"))
                 .withTag("vgi.result_columns_schema", COLUMNS_SCHEMA)
-                .withExamples(java.util.List.of(new FunctionExample(q, desc, null)))
-                .withTag("vgi.example_queries", Examples.exampleQueriesTag(q, desc));
+                .withExamples(java.util.List.of(
+                        new FunctionExample(q, desc, null),
+                        new FunctionExample(
+                                Examples.LAB_RESULTS_SQL, Examples.LAB_RESULTS_DESC, null)))
+                .withTag("vgi.example_queries", Examples.exampleQueriesTag(
+                        q, desc, Examples.LAB_RESULTS_SQL, Examples.LAB_RESULTS_DESC));
     }
 
     /** Structured result schema (static — same columns for every call) for VGI307. */

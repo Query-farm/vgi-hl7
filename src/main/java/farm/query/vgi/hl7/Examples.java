@@ -34,6 +34,55 @@ final class Examples {
                     + "OBX|2|NM|HGB^Hemoglobin||14.1|g/dL|13.5-17.5|N'";
 
     /**
+     * Composed example: treat {@code example_messages} as a raw-message feed table
+     * and turn it into an ordered message log — {@code is_valid_hl7} gates out
+     * malformed rows, {@code hl7_get} reads the send time (MSH-7), and the MSH
+     * accessors add control id, type, and version. Driven by the per-row scalars,
+     * so it lives on {@code hl7_get} (and the view) as well as the schema list.
+     *
+     * <p>Uses a single {@code hl7_get} location on purpose: the community
+     * extension currently merges two {@code hl7_get} calls that differ only in
+     * their constant location (see CLAUDE.md, sharp edge 8).
+     */
+    static final String FEED_LOG_SQL =
+            "SELECT strptime(hl7.main.hl7_get(message, 'MSH-7'), '%Y%m%d%H%M%S') AS sent_at, "
+                    + "hl7.main.hl7_message_control_id(message) AS control_id, "
+                    + "hl7.main.hl7_message_type(message) AS message_type, "
+                    + "hl7.main.hl7_version(message) AS version "
+                    + "FROM hl7.main.example_messages "
+                    + "WHERE hl7.main.is_valid_hl7(message) "
+                    + "ORDER BY sent_at, control_id";
+
+    static final String FEED_LOG_DESC =
+            "Turn a table of raw messages into an ordered message log: skip malformed rows "
+                    + "with is_valid_hl7, read the send time (MSH-7) with hl7_get as a TIMESTAMP, "
+                    + "and add the control id, message type, and version from the MSH accessors "
+                    + "(here: MSG00001 ADT^A01 at 12:00, then MSG00002 ORU^R01 at 12:30).";
+
+    /**
+     * Composed example: flatten an ORU^R01 lab report into one row per OBX result
+     * by pivoting {@code hl7_fields}' long-format rows on {@code segment_rep}, and
+     * stamp each result with the patient MRN read once via {@code hl7_get}
+     * (header-detail denormalisation, as a results warehouse load would).
+     */
+    static final String LAB_RESULTS_SQL =
+            "SELECT hl7.main.hl7_get(" + ORU_MSG_SQL + ", 'PID-3.1') AS mrn, "
+                    + "f.segment_rep + 1 AS obx_set_id, "
+                    + "split_part(max(f.value) FILTER (WHERE f.field = 3), '^', 2) AS test, "
+                    + "TRY_CAST(max(f.value) FILTER (WHERE f.field = 5) AS DOUBLE) AS result, "
+                    + "max(f.value) FILTER (WHERE f.field = 6) AS units, "
+                    + "max(f.value) FILTER (WHERE f.field = 7) AS reference_range, "
+                    + "max(f.value) FILTER (WHERE f.field = 8) AS abnormal_flag "
+                    + "FROM hl7.main.hl7_fields(" + ORU_MSG_SQL + ") AS f "
+                    + "WHERE f.segment = 'OBX' GROUP BY f.segment_rep ORDER BY obx_set_id";
+
+    static final String LAB_RESULTS_DESC =
+            "Flatten an ORU^R01 lab report into one row per OBX result (test name, numeric "
+                    + "value, units, reference range, abnormal flag) by pivoting hl7_fields on "
+                    + "segment_rep, stamped with the patient MRN from hl7_get('PID-3.1') "
+                    + "(two rows: White Blood Cell Count 7.2 and Hemoglobin 14.1 for MRN 10001).";
+
+    /**
      * Guaranteed-runnable, catalog-qualified examples (VGI509) attached to one
      * object. Each {@code sql} is self-contained and re-runnable against an
      * attached {@code hl7} worker; {@code expected_result} is omitted on purpose
@@ -64,6 +113,10 @@ final class Examples {
                     + "  {\n"
                     + "    \"description\": \"Validate that a well-formed message parses.\",\n"
                     + "    \"sql\": \"SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ") AS ok\"\n"
+                    + "  },\n"
+                    + "  {\n"
+                    + "    \"description\": " + jsonString(FEED_LOG_DESC) + ",\n"
+                    + "    \"sql\": " + jsonString(FEED_LOG_SQL) + "\n"
                     + "  }\n"
                     + "]";
 
@@ -128,6 +181,13 @@ final class Examples {
                                 + "\n\nReturn the single boolean validation result.")
                 + ","
                 + taskJson(
+                        "example_message_span_minutes",
+                        "The worker's built-in example messages each carry the time they were "
+                                + "sent in MSH-7 (format YYYYMMDDHHMMSS). How many whole minutes "
+                                + "elapsed between the earliest-sent and the latest-sent built-in "
+                                + "example message? Return a single integer column.")
+                + ","
+                + taskJson(
                         "list_example_messages",
                         "This worker ships a built-in catalog of ready-to-use example HL7 v2 "
                                 + "messages. List the message type of each built-in example, one "
@@ -164,7 +224,9 @@ final class Examples {
                     "SELECT hl7.main.hl7_message_control_id(" + SAMPLE_MSG_SQL + ") AS control_id",
                     "Read the message control id (MSH-10) used for ACK correlation and dedupe.",
                     "SELECT hl7.main.is_valid_hl7(" + SAMPLE_MSG_SQL + ") AS ok",
-                    "Validate that a well-formed HL7 v2 message parses.");
+                    "Validate that a well-formed HL7 v2 message parses.",
+                    FEED_LOG_SQL, FEED_LOG_DESC,
+                    LAB_RESULTS_SQL, LAB_RESULTS_DESC);
 
     /**
      * Build the value for a {@code vgi.example_queries} tag: a JSON array of
