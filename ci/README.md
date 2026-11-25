@@ -18,10 +18,11 @@ extension from the Haybarn community channel:
    spawn as a subprocess (the VGI LOCATION), and the same JAR serves the HTTP and
    AF_UNIX transports via `--http` / `--unix`.
 2. **Download the runner** — the `haybarn_unittest-linux-amd64.zip` asset from
-   the newest **haybarn 2.0** release (`haybarn-v2.0.*`, release candidates
+   the newest **haybarn 2.0.1** release (`haybarn-v2.0.1*`, release candidates
    included; resolved once in the `resolve-haybarn` job so the version is never
    hardcoded). A bare `gh release view` would return the 1.5 line, whose `vgi`
-   extension cannot attach this worker (VGI protocol vgi.v3 / 3.2). The warm step
+   extension cannot attach this worker (VGI protocol vgi.v3 / 3.4), and neither
+   can haybarn 2.0.0's (it serves the 3.3 build). The warm step
    uses `FORCE INSTALL` and every `haybarn-unittest` call passes `--keep-home`
    (haybarn-unittest 2.0 otherwise isolates `$HOME`, so installed extensions are
    "not found").

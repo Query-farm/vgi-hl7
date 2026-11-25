@@ -92,13 +92,13 @@ Makefile                     build / fixtures / test-unit / test-sql / test / cl
    hl7_get(m,'MSH-7')` returns the PID-3.1 value twice: the community `vgi`
    extension's `VgiScalarFunctionBindData::Equals` ignores the erased constant
    args (`const_values`), so DuckDB's common-subexpression elimination merges the
-   calls. Seen on haybarn 2.0.0rc11 (vgi `v2.0` branch). Until the extension
+   calls. Seen on haybarn 2.0.1rc3 (vgi `v2.0` branch). Until the extension
    compares `const_values`, published examples use at most one `hl7_get`
    location per query (or put each in its own subquery and join).
 
 ## SDK dependency & CI (self-contained via Maven Central)
 
-Depends on `farm.query:vgi:0.48.0` (pulls in `farm.query:vgirpc:0.33.3`
+Depends on `farm.query:vgi:0.50.1` (pulls in `farm.query:vgirpc:0.34.1`
 transitively; declared explicitly since the code imports `farm.query.vgirpc.*`).
 **On Maven Central**, so the build is fully self-contained — no sibling checkout,
 no `mavenLocal`, no composite build. `.github/workflows/test.yml` runs a
@@ -124,7 +124,9 @@ builders the JUnit tests use.
 
 ## VGI protocol / haybarn 2.0
 
-vgi 0.48.0 speaks VGI protocol **vgi.v3 / 3.3.0** (`/health` reports
-`"protocol":"vgi.v3"`); only haybarn **2.0**'s community `vgi` extension attaches
-it. CI resolves the newest `haybarn-v2.0.*` release, runs `haybarn-unittest
+vgi 0.50.1 speaks VGI protocol **vgi.v3 / 3.4.0** (`/health` reports
+`"protocol":"vgi.v3"`); major+minor must match exactly, so only the 3.4 `vgi`
+extension attaches it: Haybarn **2.0.1** (`INSTALL vgi FROM community`; Haybarn
+2.0.0 still serves the 3.3 build) or stock DuckDB 2.0 (`FROM query_farm`). CI
+resolves the newest `haybarn-v2.0.1*` release, runs `haybarn-unittest
 --keep-home`, and gates metadata with `Query-farm/vgi-lint-check@v2`.
